@@ -1,15 +1,21 @@
-import { Link, Outlet } from 'react-router-dom'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Login from './pages/login';
+import Register from './pages/register';
+import Home from './pages/home';
+import RegisterSuccess from './pages/registerSuccess';
 
-export default function App() {
+function App() {
   return (
-    <div>
-      <nav>
-        <Link to="/">Inicio</Link> | 
-        <Link to="/publicar">Publicar</Link> | 
-        <Link to="/login">Login</Link>
-      </nav>
-      <hr />
-      <Outlet />
-    </div>
-  )
+    <Router>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/registro-exitoso" element={<RegisterSuccess />} />
+      </Routes>
+    </Router>
+  );
 }
+
+export default App;

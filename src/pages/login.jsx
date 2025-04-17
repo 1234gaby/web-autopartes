@@ -1,27 +1,42 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
-  // Función para manejar el login
+  // Función para hacer login
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Cambia la URL por la de tu backend en Render
-    const response = await fetch('https://web-autopartes.vercel.app//login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
+    try {
+      const response = await fetch('https://web-autopartes-backend.onrender.com/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (response.ok) {
-      const data = await response.json();
-      console.log('Login exitoso:', data);
-      // Aquí podrías redirigir al usuario a la página de inicio o lo que necesites
-    } else {
-      console.error('Error al hacer login');
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Login exitoso:', data);
+        navigate('/home');
+      } else {
+        alert('Login incorrecto');
+      }
+    } catch (error) {
+      console.error('Error al conectar con el servidor:', error);
     }
+  };
+
+  // Función para continuar como invitado
+  const continuarComoInvitado = () => {
+    navigate('/home');
+  };
+
+  // Función para ir a la pantalla de registro
+  const irARegistro = () => {
+    navigate('/register');
   };
 
   return (
@@ -38,7 +53,7 @@ function Login() {
           />
         </div>
         <div>
-          <label>Password:</label>
+          <label>Contraseña:</label>
           <input
             type="password"
             value={password}
@@ -48,6 +63,11 @@ function Login() {
         </div>
         <button type="submit">Iniciar sesión</button>
       </form>
+
+      <br />
+
+      <button onClick={irARegistro}>Registrarse</button>
+      <button onClick={continuarComoInvitado}>Continuar como invitado</button>
     </div>
   );
 }
