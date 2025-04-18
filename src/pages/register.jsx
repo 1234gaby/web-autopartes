@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function Register() {
@@ -10,52 +10,62 @@ function Register() {
     e.preventDefault();
 
     try {
-      const response = await fetch('https://web-autopartes-backend.onrender.com/register', {
+      const res = await fetch('https://web-autopartes-backend.onrender.com/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
 
-      if (response.ok) {
-        console.log('Usuario registrado con éxito');
-        navigate('/registro-exitoso');
-      } else {
-        const data = await response.json();
-        console.log('Error:', data.error); // Para ver qué devuelve exactamente el backend
-        alert('No se pudo registrar el usuario: ' + data.error);
+      const data = await res.json();
 
+      if (res.ok) {
+        navigate('/registersuccess');
+      } else {
+        alert(data.mensaje || 'Error al registrar');
       }
     } catch (error) {
-      console.error('Error al registrar:', error);
-      alert('Ocurrió un error. Intenta de nuevo.');
+      alert('Error de conexión al servidor');
+      console.error(error);
     }
   };
 
   return (
-    <div>
-      <h2>Registro</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Email:</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Contraseña:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Registrarse</button>
-      </form>
-    </div>
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-4 p-4 max-w-sm mx-auto mt-10"
+    >
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="border p-2 rounded"
+        required
+      />
+      <input
+        type="password"
+        placeholder="Contraseña"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="border p-2 rounded"
+        required
+      />
+      <button
+        type="submit"
+        className="bg-green-600 text-white p-2 rounded"
+      >
+        Registrarse
+      </button>
+
+      {/* Botón para volver al login */}
+      <button
+        type="button"
+        className="bg-gray-500 text-white p-2 rounded"
+        onClick={() => navigate('/')}
+      >
+        Volver al login
+      </button>
+    </form>
   );
 }
 
