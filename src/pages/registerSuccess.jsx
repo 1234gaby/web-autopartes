@@ -1,4 +1,3 @@
-// pages/RegisterSuccess.jsx
 import { useNavigate } from 'react-router-dom';
 
 const RegisterSuccess = () => {
@@ -21,3 +20,5 @@ const RegisterSuccess = () => {
 };
 
 export default RegisterSuccess;
+
+
