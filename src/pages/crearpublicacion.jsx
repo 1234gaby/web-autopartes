@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const CrearPublicacion = () => {
-  // Obtener el user_id (esto debe adaptarse según cómo guardes el ID del usuario)
-  const userId = localStorage.getItem('user_id'); // O de donde tengas el ID del usuario
+  const userId = localStorage.getItem('user_id');
 
   const [formData, setFormData] = useState({
     nombre_producto: '',
@@ -19,7 +18,7 @@ const CrearPublicacion = () => {
     compatibilidad: [],
     marca_repuesto: '',
     fotos: [],
-    user_id: userId, // Aquí agregamos el user_id al estado del formulario
+    user_id: userId,
   });
 
   const [modelosDisponibles, setModelosDisponibles] = useState([]);
@@ -53,7 +52,7 @@ const CrearPublicacion = () => {
         alert('Solo se pueden subir hasta 5 fotos');
         return;
       }
-      const fileArray = Array.from(files).map(file => file.name);
+      const fileArray = Array.from(files);
       setFormData({ ...formData, fotos: fileArray });
     } else {
       setFormData({ ...formData, [name]: value });
@@ -71,9 +70,35 @@ const CrearPublicacion = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // No es necesario modificar el user_id aquí porque ya está en formData.
+    const data = new FormData();
+    data.append('nombre_producto', formData.nombre_producto);
+    data.append('marca', formData.marca);
+    data.append('modelo', formData.modelo);
+    data.append('precio', formData.precio);
+    data.append('ubicacion', formData.ubicacion);
+    data.append('envio', formData.envio);
+    data.append('tipo_envio', formData.tipo_envio);
+    data.append('categoria', formData.categoria);
+    data.append('estado', formData.estado);
+    data.append('codigo_serie', formData.codigo_serie);
+    data.append('marca_repuesto', formData.marca_repuesto);
+    data.append('user_id', formData.user_id);
+
+    // Compatibilidad como JSON string
+    data.append('compatibilidad', JSON.stringify(formData.compatibilidad));
+
+    // Agregar fotos al FormData
+    formData.fotos.forEach((file) => {
+      data.append('fotos', file);
+    });
+
     try {
-      await axios.post('https://web-autopartes-backend.onrender.com/publicaciones', formData);
+      await axios.post('https://web-autopartes-backend.onrender.com/publicaciones', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
       alert('Publicación creada exitosamente');
     } catch (error) {
       console.error(error);

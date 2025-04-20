@@ -20,12 +20,18 @@ function Login() {
       if (response.ok) {
         const data = await response.json();
         console.log('Login exitoso:', data);
+        
+        // Guardar el user_id en localStorage
+        localStorage.setItem('user_id', data.user_id); // Aquí guardamos el user_id
+
+        // Navegar a la página principal
         navigate('/home');
       } else {
         alert('Login incorrecto');
       }
     } catch (error) {
       console.error('Error al conectar con el servidor:', error);
+      alert('Error de conexión al servidor');
     }
   };
 
