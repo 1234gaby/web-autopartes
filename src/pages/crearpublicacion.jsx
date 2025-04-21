@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const CrearPublicacion = () => {
   const userId = localStorage.getItem('user_id');
+  const navigate = useNavigate();
+  const [publicacionExitosa, setPublicacionExitosa] = useState(false);
 
   const [formData, setFormData] = useState({
     nombre_producto: '',
@@ -83,14 +86,8 @@ const CrearPublicacion = () => {
     data.append('codigo_serie', formData.codigo_serie);
     data.append('marca_repuesto', formData.marca_repuesto);
     data.append('user_id', formData.user_id);
-
-    // Compatibilidad como JSON string
     data.append('compatibilidad', JSON.stringify(formData.compatibilidad));
-
-    // Agregar fotos al FormData
-    formData.fotos.forEach((file) => {
-      data.append('fotos', file);
-    });
+    formData.fotos.forEach((file) => data.append('fotos', file));
 
     try {
       await axios.post('https://web-autopartes-backend.onrender.com/publicaciones', data, {
@@ -99,103 +96,211 @@ const CrearPublicacion = () => {
         },
       });
 
-      alert('Publicación creada exitosamente');
+      setPublicacionExitosa(true);
     } catch (error) {
       console.error(error);
       alert('Error al crear la publicación');
     }
   };
 
+  if (publicacionExitosa) {
+    return (
+      <div className="text-center mt-8">
+        <h2 className="text-2xl font-semibold">¡Publicación creada con éxito!</h2>
+        <button
+          onClick={() => navigate('/home')}
+          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+        >
+          Volver al Home
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '1rem', maxWidth: '600px', margin: 'auto' }}>
-      <h2>Crear Publicación</h2>
+    <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+      <button
+        onClick={() => navigate('/home')}
+        className="mb-4 px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
+      >
+        ← Volver al Home
+      </button>
 
-      <input type="text" name="nombre_producto" placeholder="Nombre del producto" onChange={handleChange} required />
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <h2 className="text-2xl font-semibold text-center">Crear Publicación</h2>
 
-      <select name="marca" onChange={handleChange} required>
-        <option value="">Seleccionar marca</option>
-        {Object.keys(modelosPorMarca).map(m => (
-          <option key={m} value={m}>{m}</option>
-        ))}
-      </select>
+        <input
+          type="text"
+          name="nombre_producto"
+          placeholder="Nombre del producto"
+          onChange={handleChange}
+          required
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
 
-      <select name="modelo" onChange={handleChange} value={formData.modelo} required>
-        <option value="">Seleccionar modelo</option>
-        {modelosDisponibles.map(mod => (
-          <option key={mod} value={mod}>{mod}</option>
-        ))}
-      </select>
-
-      <input type="number" name="precio" placeholder="Precio" onChange={handleChange} required />
-
-      <select name="ubicacion" onChange={handleChange} required>
-        <option value="">Seleccionar localidad</option>
-        {localidadesBrown.map(loc => (
-          <option key={loc} value={loc}>{loc}</option>
-        ))}
-      </select>
-
-      <label>
-        ¿Envío?
-        <select name="envio" onChange={handleChange}>
-          <option value="no">No</option>
-          <option value="si">Sí</option>
-        </select>
-      </label>
-
-      {formData.envio === 'si' && (
-        <select name="tipo_envio" onChange={handleChange}>
-          <option value="">Seleccionar tipo de envío</option>
-          <option value="uber_moto">Uber Moto</option>
-          <option value="uber_auto">Uber Auto</option>
-          <option value="flete">Flete</option>
-        </select>
-      )}
-
-      <select name="categoria" onChange={handleChange} required>
-        <option value="">Seleccionar categoría</option>
-        {categorias.map(cat => (
-          <option key={cat} value={cat}>{cat}</option>
-        ))}
-      </select>
-
-      <select name="estado" onChange={handleChange}>
-        <option value="nuevo">Nuevo</option>
-        <option value="usado">Usado</option>
-      </select>
-
-      <input type="text" name="codigo_serie" placeholder="Código de serie" onChange={handleChange} />
-
-      <div>
-        <h4>Compatibilidad</h4>
-        <select value={compatibilidadTemp.marca} onChange={e => setCompatibilidadTemp({ ...compatibilidadTemp, marca: e.target.value })}>
-          <option value="">Marca</option>
+        <select
+          name="marca"
+          onChange={handleChange}
+          required
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Seleccionar marca</option>
           {Object.keys(modelosPorMarca).map(m => (
             <option key={m} value={m}>{m}</option>
           ))}
         </select>
-        {compatibilidadTemp.marca && (
-          <select value={compatibilidadTemp.modelo} onChange={e => setCompatibilidadTemp({ ...compatibilidadTemp, modelo: e.target.value })}>
-            <option value="">Modelo</option>
-            {(modelosPorMarca[compatibilidadTemp.marca] || []).map(mod => (
-              <option key={mod} value={mod}>{mod}</option>
-            ))}
+
+        <select
+          name="modelo"
+          onChange={handleChange}
+          value={formData.modelo}
+          required
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Seleccionar modelo</option>
+          {modelosDisponibles.map(mod => (
+            <option key={mod} value={mod}>{mod}</option>
+          ))}
+        </select>
+
+        <input
+          type="number"
+          name="precio"
+          placeholder="Precio"
+          onChange={handleChange}
+          required
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        <select
+          name="ubicacion"
+          onChange={handleChange}
+          required
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Seleccionar localidad</option>
+          {localidadesBrown.map(loc => (
+            <option key={loc} value={loc}>{loc}</option>
+          ))}
+        </select>
+
+        <label className="block">
+          ¿Envío?
+          <select
+            name="envio"
+            onChange={handleChange}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="no">No</option>
+            <option value="si">Sí</option>
+          </select>
+        </label>
+
+        {formData.envio === 'si' && (
+          <select
+            name="tipo_envio"
+            onChange={handleChange}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Seleccionar tipo de envío</option>
+            <option value="uber_moto">Uber Moto</option>
+            <option value="uber_auto">Uber Auto</option>
+            <option value="flete">Flete</option>
           </select>
         )}
-        <button type="button" onClick={agregarCompatibilidad}>Agregar</button>
-        <ul>
-          {formData.compatibilidad.map((c, i) => (
-            <li key={i}>{c.marca} - {c.modelo}</li>
+
+        <select
+          name="categoria"
+          onChange={handleChange}
+          required
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Seleccionar categoría</option>
+          {categorias.map(cat => (
+            <option key={cat} value={cat}>{cat}</option>
           ))}
-        </ul>
-      </div>
+        </select>
 
-      <input type="text" name="marca_repuesto" placeholder="Marca/Fabricante del repuesto" onChange={handleChange} />
+        <select
+          name="estado"
+          onChange={handleChange}
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="nuevo">Nuevo</option>
+          <option value="usado">Usado</option>
+        </select>
 
-      <input type="file" name="fotos" multiple accept="image/*" onChange={handleChange} />
+        <input
+          type="text"
+          name="codigo_serie"
+          placeholder="Código de serie"
+          onChange={handleChange}
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
 
-      <button type="submit">Crear Publicación</button>
-    </form>
+        <div className="space-y-2">
+          <h4 className="font-semibold">Compatibilidad</h4>
+          <select
+            value={compatibilidadTemp.marca}
+            onChange={e => setCompatibilidadTemp({ ...compatibilidadTemp, marca: e.target.value })}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Marca</option>
+            {Object.keys(modelosPorMarca).map(m => (
+              <option key={m} value={m}>{m}</option>
+            ))}
+          </select>
+          {compatibilidadTemp.marca && (
+            <select
+              value={compatibilidadTemp.modelo}
+              onChange={e => setCompatibilidadTemp({ ...compatibilidadTemp, modelo: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Modelo</option>
+              {(modelosPorMarca[compatibilidadTemp.marca] || []).map(mod => (
+                <option key={mod} value={mod}>{mod}</option>
+              ))}
+            </select>
+          )}
+          <button
+            type="button"
+            onClick={agregarCompatibilidad}
+            className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
+          >
+            Agregar
+          </button>
+          <ul>
+            {formData.compatibilidad.map((c, i) => (
+              <li key={i}>{c.marca} - {c.modelo}</li>
+            ))}
+          </ul>
+        </div>
+
+        <input
+          type="text"
+          name="marca_repuesto"
+          placeholder="Marca/Fabricante del repuesto"
+          onChange={handleChange}
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        <input
+          type="file"
+          name="fotos"
+          multiple
+          accept="image/*"
+          onChange={handleChange}
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        <button
+          type="submit"
+          className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600"
+        >
+          Crear Publicación
+        </button>
+      </form>
+    </div>
   );
 };
 
