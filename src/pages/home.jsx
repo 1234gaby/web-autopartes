@@ -55,6 +55,21 @@ function Home() {
       return 0;
     });
 
+  // Función para parsear fotos, con control de error
+  const obtenerFotos = (fotos) => {
+    if (!fotos) return [];
+    if (typeof fotos === 'string') {
+      try {
+        return JSON.parse(fotos);
+      } catch {
+        // Si no es JSON válido, retornamos un array con el string mismo
+        return [fotos];
+      }
+    }
+    // Si ya es un array u objeto, retornamos tal cual (asumimos array)
+    return fotos;
+  };
+
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-6">
@@ -118,25 +133,28 @@ function Home() {
       </button>
 
       <div className="grid gap-4">
-        {publicacionesFiltradas.map(publi => (
-          <div key={publi.id} className="border p-4 rounded shadow flex gap-4">
-            <div className="w-24 h-24 flex-shrink-0 overflow-hidden rounded">
-              <img
-                src={`https://web-autopartes-backend.onrender.com/uploads/${JSON.parse(publi.fotos)[0]}`}
-                alt="Miniatura"
-                className="w-full h-full object-cover"
-              />
+        {publicacionesFiltradas.map(publi => {
+          const fotosArray = obtenerFotos(publi.fotos);
+          return (
+            <div key={publi.id} className="border p-4 rounded shadow flex gap-4">
+              <div className="w-24 h-24 flex-shrink-0 overflow-hidden rounded">
+                <img
+                  src={`https://web-autopartes-backend.onrender.com/uploads/${fotosArray[0]}`}
+                  alt="Miniatura"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold">{publi.nombre_producto}</h2>
+                <p className="text-sm">Precio: ${publi.precio}</p>
+                <p className="text-sm">Marca: {publi.marca}</p>
+                <p className="text-sm">Modelo: {publi.modelo}</p>
+                <p className="text-sm">Categoría: {publi.categoria}</p>
+                <p className="text-sm">Estado: {publi.estado}</p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-lg font-bold">{publi.nombre_producto}</h2>
-              <p className="text-sm">Precio: ${publi.precio}</p>
-              <p className="text-sm">Marca: {publi.marca}</p>
-              <p className="text-sm">Modelo: {publi.modelo}</p>
-              <p className="text-sm">Categoría: {publi.categoria}</p>
-              <p className="text-sm">Estado: {publi.estado}</p>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
