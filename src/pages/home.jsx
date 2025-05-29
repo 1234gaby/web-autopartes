@@ -26,135 +26,140 @@ function Home() {
     'Longchamps', 'Malvinas Argentinas', 'Ministro Rivadavia', 'Rafael Calzada', 'San José', 'Solano'
   ];
 
-  useEffect(() => {
-    axios.get('https://web-autopartes-backend.onrender.com/publicaciones')
-      .then(res => setPublicaciones(res.data))
-      .catch(err => console.error(err));
-  }, []);
-
-  const cerrarSesion = () => {
-    localStorage.removeItem('user_id');
-    navigate('/');
+  const fetchPublicaciones = async () => {
+    try {
+      const res = await axios.get('https://web-autopartes-backend.onrender.com/publicaciones');
+      setPublicaciones(res.data);
+    } catch (error) {
+      console.error('Error al cargar publicaciones', error);
+    }
   };
 
-  const publicacionesFiltradas = publicaciones
-    .filter(p => {
-      return (
-        (!filtros.marca || p.marca === filtros.marca) &&
-        (!filtros.modelo || p.modelo === filtros.modelo) &&
-        (!filtros.ubicacion || p.ubicacion === filtros.ubicacion) &&
-        (!filtros.envio || p.envio === filtros.envio) &&
-        (!filtros.estado || p.estado === filtros.estado)
-      );
-    })
-    .sort((a, b) => {
-      if (orden === 'nombre-asc') return a.nombre_producto.localeCompare(b.nombre_producto);
-      if (orden === 'nombre-desc') return b.nombre_producto.localeCompare(a.nombre_producto);
-      if (orden === 'precio-asc') return a.precio - b.precio;
-      if (orden === 'precio-desc') return b.precio - a.precio;
-      return 0;
-    });
+  useEffect(() => {
+    fetchPublicaciones();
+  }, []);
 
-  // Función para parsear fotos, con control de error
-  const obtenerFotos = (fotos) => {
-    if (!fotos) return [];
-    if (typeof fotos === 'string') {
-      try {
-        return JSON.parse(fotos);
-      } catch {
-        // Si no es JSON válido, retornamos un array con el string mismo
-        return [fotos];
-      }
+  const handleFiltroChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'marca') {
+      setFiltros({ ...filtros, marca: value, modelo: '' }); // resetear modelo
+    } else {
+      setFiltros({ ...filtros, [name]: value });
     }
-    // Si ya es un array u objeto, retornamos tal cual (asumimos array)
-    return fotos;
+  };
+
+  const filtrarPublicaciones = () => {
+    return publicaciones
+      .filter(pub => (
+        (!filtros.marca || pub.marca === filtros.marca) &&
+        (!filtros.modelo || pub.modelo === filtros.modelo) &&
+        (!filtros.ubicacion || pub.ubicacion === filtros.ubicacion) &&
+        (!filtros.envio || pub.envio === filtros.envio) &&
+        (!filtros.estado || pub.estado === filtros.estado)
+      ))
+      .sort((a, b) => {
+        if (orden === 'precio') return a.precio - b.precio;
+        if (orden === 'nombre') return a.nombre_producto.localeCompare(b.nombre_producto);
+        return 0;
+      });
   };
 
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Bienvenido al Home</h1>
-        <button
-          onClick={cerrarSesion}
-          className="bg-red-600 text-white px-4 py-2 rounded"
-        >
-          Cerrar sesión
-        </button>
+    <div className="p-4 max-w-6xl mx-auto">
+      {/* Encabezado y botones */}
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+        <h1 className="text-2xl font-bold">Publicaciones</h1>
+        <div className="space-x-2">
+          <button
+            onClick={() => navigate('/crearpublicacion')}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Crear Publicación
+          </button>
+          <button
+            onClick={() => navigate('/micuenta')}
+            className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+          >
+            Mi Cuenta
+          </button>
+          <button
+            onClick={() => {
+              localStorage.removeItem('user_id');
+              navigate('/');
+            }}
+            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+          >
+            Cerrar sesión
+          </button>
+        </div>
       </div>
 
-      <div className="mb-4 flex flex-wrap gap-2">
-        <select onChange={(e) => setFiltros({ ...filtros, marca: e.target.value })}>
+      {/* Filtros */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <select name="marca" value={filtros.marca} onChange={handleFiltroChange} className="p-2 border rounded">
           <option value="">Marca</option>
           {Object.keys(modelosPorMarca).map(m => (
             <option key={m} value={m}>{m}</option>
           ))}
         </select>
 
-        <select onChange={(e) => setFiltros({ ...filtros, modelo: e.target.value })}>
+        <select name="modelo" value={filtros.modelo} onChange={handleFiltroChange} className="p-2 border rounded">
           <option value="">Modelo</option>
-          {Object.values(modelosPorMarca).flat().map(mod => (
+          {(modelosPorMarca[filtros.marca] || []).map(mod => (
             <option key={mod} value={mod}>{mod}</option>
           ))}
         </select>
 
-        <select onChange={(e) => setFiltros({ ...filtros, ubicacion: e.target.value })}>
+        <select name="ubicacion" value={filtros.ubicacion} onChange={handleFiltroChange} className="p-2 border rounded">
           <option value="">Ubicación</option>
           {localidadesBrown.map(loc => (
             <option key={loc} value={loc}>{loc}</option>
           ))}
         </select>
 
-        <select onChange={(e) => setFiltros({ ...filtros, envio: e.target.value })}>
-          <option value="">¿Envío?</option>
+        <select name="envio" value={filtros.envio} onChange={handleFiltroChange} className="p-2 border rounded">
+          <option value="">Envío</option>
           <option value="si">Sí</option>
           <option value="no">No</option>
         </select>
 
-        <select onChange={(e) => setFiltros({ ...filtros, estado: e.target.value })}>
+        <select name="estado" value={filtros.estado} onChange={handleFiltroChange} className="p-2 border rounded">
           <option value="">Estado</option>
           <option value="nuevo">Nuevo</option>
           <option value="usado">Usado</option>
         </select>
 
-        <select onChange={(e) => setOrden(e.target.value)}>
+        <select value={orden} onChange={(e) => setOrden(e.target.value)} className="p-2 border rounded">
           <option value="">Ordenar por</option>
-          <option value="nombre-asc">Nombre A-Z</option>
-          <option value="nombre-desc">Nombre Z-A</option>
-          <option value="precio-asc">Precio menor a mayor</option>
-          <option value="precio-desc">Precio mayor a menor</option>
+          <option value="nombre">Nombre</option>
+          <option value="precio">Precio</option>
         </select>
       </div>
 
-      <button
-        className="bg-blue-600 text-white px-4 py-2 rounded mb-4"
-        onClick={() => navigate('/crear-publicacion')}
-      >
-        Crear publicación
-      </button>
-
-      <div className="grid gap-4">
-        {publicacionesFiltradas.map(publi => {
-          const fotosArray = obtenerFotos(publi.fotos);
-          return (
-            <div key={publi.id} className="border p-4 rounded shadow flex gap-4">
-              <div className="w-24 h-24 flex-shrink-0 overflow-hidden rounded">
-                <img
-                  src={`https://web-autopartes-backend.onrender.com/uploads/${fotosArray[0]}`}
-                  alt="Miniatura"
-                  className="w-full h-full object-cover"
-                />
+      {/* Lista de publicaciones */}
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+        {filtrarPublicaciones().map(pub => (
+          <div key={pub.id} className="border p-4 rounded shadow hover:shadow-md transition-shadow duration-200">
+            {pub.fotos && pub.fotos.length > 0 ? (
+              <img
+                src={pub.fotos[0]}
+                alt={pub.nombre_producto}
+                className="w-full h-48 object-cover rounded mb-2"
+              />
+            ) : (
+              <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded mb-2 text-gray-600">
+                Sin imagen
               </div>
-              <div>
-                <h2 className="text-lg font-bold">{publi.nombre_producto}</h2>
-                <p className="text-sm">Precio: ${publi.precio}</p>
-                <p className="text-sm">Marca: {publi.marca}</p>
-                <p className="text-sm">Modelo: {publi.modelo}</p>
-                <p className="text-sm">Categoría: {publi.categoria}</p>
-                <p className="text-sm">Estado: {publi.estado}</p>
-              </div>
-            </div>
-          );
-        })}
+            )}
+            <h2 className="text-xl font-bold">{pub.nombre_producto}</h2>
+            <p><strong>Marca:</strong> {pub.marca}</p>
+            <p><strong>Modelo:</strong> {pub.modelo}</p>
+            <p><strong>Precio:</strong> ${pub.precio}</p>
+            <p><strong>Ubicación:</strong> {pub.ubicacion}</p>
+            <p><strong>Estado:</strong> {pub.estado}</p>
+            <p><strong>Envío:</strong> {pub.envio === 'si' ? pub.tipo_envio : 'No'}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
