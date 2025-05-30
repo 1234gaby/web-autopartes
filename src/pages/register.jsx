@@ -62,15 +62,22 @@ function Register() {
   };
 
   return (
-    <div className="p-4 max-w-xl mx-auto">
-      <h1 className="text-xl font-bold mb-4">Registro</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <label>
-          Tipo de cuenta:
+    <div className="p-6 max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-lg shadow-lg mt-8
+                    border border-gray-200 dark:border-gray-700">
+      <h1 className="text-2xl font-extrabold mb-6 text-center text-gray-800 dark:text-gray-100">
+        Registro
+      </h1>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <label className="block">
+          <span className="text-gray-700 dark:text-gray-300 font-semibold">Tipo de cuenta:</span>
           <select
             value={tipoCuenta}
             onChange={(e) => setTipoCuenta(e.target.value)}
-            className="ml-2 border rounded px-2 py-1"
+            className="mt-1 block w-full rounded border border-gray-300 dark:border-gray-600
+                       bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+                       px-3 py-2
+                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                       transition duration-200 ease-in-out"
           >
             <option value="mecanico">Mecánico</option>
             <option value="vendedor">Vendedor</option>
@@ -85,7 +92,11 @@ function Register() {
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
               required
-              className="block w-full border rounded px-3 py-2"
+              className="block w-full border border-gray-300 dark:border-gray-600 rounded
+                         bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+                         px-4 py-2
+                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                         transition duration-200 ease-in-out"
             />
             <input
               type="text"
@@ -93,15 +104,21 @@ function Register() {
               value={apellido}
               onChange={(e) => setApellido(e.target.value)}
               required
-              className="block w-full border rounded px-3 py-2"
+              className="block w-full border border-gray-300 dark:border-gray-600 rounded
+                         bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+                         px-4 py-2
+                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                         transition duration-200 ease-in-out"
             />
-            <label>
-              Certificado de estudio (opcional):
+            <label className="block">
+              <span className="text-gray-700 dark:text-gray-300 font-semibold">
+                Certificado de estudio (opcional):
+              </span>
               <input
                 type="file"
                 accept="image/*,.pdf"
                 onChange={(e) => setCertificadoFile(e.target.files[0])}
-                className="block"
+                className="mt-1 block w-full text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 rounded"
               />
             </label>
           </>
@@ -115,7 +132,11 @@ function Register() {
               value={nombreLocal}
               onChange={(e) => setNombreLocal(e.target.value)}
               required
-              className="block w-full border rounded px-3 py-2"
+              className="block w-full border border-gray-300 dark:border-gray-600 rounded
+                         bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+                         px-4 py-2
+                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                         transition duration-200 ease-in-out"
             />
             <input
               type="text"
@@ -123,7 +144,11 @@ function Register() {
               value={localidad}
               onChange={(e) => setLocalidad(e.target.value)}
               required
-              className="block w-full border rounded px-3 py-2"
+              className="block w-full border border-gray-300 dark:border-gray-600 rounded
+                         bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+                         px-4 py-2
+                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                         transition duration-200 ease-in-out"
             />
             <input
               type="text"
@@ -131,15 +156,21 @@ function Register() {
               value={dni}
               onChange={(e) => setDni(e.target.value)}
               required
-              className="block w-full border rounded px-3 py-2"
+              className="block w-full border border-gray-300 dark:border-gray-600 rounded
+                         bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+                         px-4 py-2
+                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                         transition duration-200 ease-in-out"
             />
-            <label>
-              Constancia de AFIP (opcional):
+            <label className="block">
+              <span className="text-gray-700 dark:text-gray-300 font-semibold">
+                Constancia de AFIP (opcional):
+              </span>
               <input
                 type="file"
                 accept="image/*,.pdf"
                 onChange={(e) => setAfipFile(e.target.files[0])}
-                className="block"
+                className="mt-1 block w-full text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 rounded"
               />
             </label>
           </>
@@ -151,7 +182,11 @@ function Register() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="block w-full border rounded px-3 py-2"
+          className="block w-full border border-gray-300 dark:border-gray-600 rounded
+                     bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+                     px-4 py-2
+                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                     transition duration-200 ease-in-out"
         />
         <input
           type="password"
@@ -159,12 +194,18 @@ function Register() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="block w-full border rounded px-3 py-2"
+          className="block w-full border border-gray-300 dark:border-gray-600 rounded
+                     bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+                     px-4 py-2
+                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                     transition duration-200 ease-in-out"
         />
 
         <button
           type="submit"
-          className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+          className="w-full bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300
+                     text-white py-3 rounded-md
+                     focus:outline-none transition duration-300 ease-in-out font-semibold"
         >
           Registrarse
         </button>

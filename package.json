@@ -12,6 +12,7 @@
     "assert": "^2.1.0",
     "axios": "^1.8.4",
     "crypto-browserify": "^3.12.1",
+    "framer-motion": "^12.15.0",
     "https-browserify": "^1.0.0",
     "lucide-react": "^0.511.0",
     "pg": "^8.16.0",
