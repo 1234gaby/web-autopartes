@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Button } from '../components/ui/button.jsx';
+import { Input } from '../components/ui/input.jsx';
+import { Label } from '../components/ui/label.jsx';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card.jsx';
+import { Loader2 } from 'lucide-react';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -42,7 +42,7 @@ function Login() {
   const irARegistro = () => navigate('/register');
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4">
       <Card className="w-full max-w-md p-6">
         <CardHeader>
           <CardTitle className="text-3xl text-center">Iniciar sesión</CardTitle>
@@ -57,6 +57,7 @@ function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                autoComplete="username"
               />
             </div>
             <div>
@@ -67,27 +68,26 @@ function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                autoComplete="current-password"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
+            <Button type="submit" disabled={loading} className="flex items-center justify-center">
+              {loading && <Loader2 className="animate-spin mr-2 h-4 w-4" />}
               Iniciar sesión
             </Button>
           </form>
 
           <div className="mt-6 space-y-3">
             <Button
-              variant="secondary"
-              className="w-full"
               onClick={irARegistro}
+              className="w-full bg-gray-300 text-gray-800 hover:bg-gray-400"
             >
               Registrarse
             </Button>
 
             <Button
-              variant="success"
-              className="w-full bg-green-600 hover:bg-green-700 text-white"
               onClick={continuarComoInvitado}
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
             >
               Continuar como invitado
             </Button>
