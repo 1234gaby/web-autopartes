@@ -6,7 +6,6 @@ function Login() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  // Función para hacer login
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -20,11 +19,9 @@ function Login() {
       if (response.ok) {
         const data = await response.json();
         console.log('Login exitoso:', data);
-        
-        // Guardar el user_id en localStorage
-        localStorage.setItem('user_id', data.user_id); // Aquí guardamos el user_id
 
-        // Navegar a la página principal
+        localStorage.setItem('user_id', data.user_id);
+
         navigate('/home');
       } else {
         alert('Login incorrecto');
@@ -35,12 +32,10 @@ function Login() {
     }
   };
 
-  // Función para continuar como invitado
   const continuarComoInvitado = () => {
     navigate('/home');
   };
 
-  // Función para ir a la pantalla de registro
   const irARegistro = () => {
     navigate('/register');
   };
@@ -49,7 +44,7 @@ function Login() {
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-6 bg-white shadow-lg rounded-lg">
         <h2 className="text-3xl font-bold text-center mb-8">Iniciar sesión</h2>
-        
+
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
@@ -62,7 +57,7 @@ function Login() {
               required
             />
           </div>
-          
+
           <div className="mb-6">
             <label htmlFor="password" className="block text-sm font-medium text-gray-700">Contraseña</label>
             <input

@@ -44,15 +44,16 @@ function Register() {
     try {
       const res = await fetch('https://web-autopartes-backend.onrender.com/register', {
         method: 'POST',
-        body: formData
+        body: formData,
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        navigate('/registersuccess');
+        alert('Registro exitoso');
+        navigate('/login');
       } else {
-        alert(data.mensaje || 'Error al registrar');
+        alert(data.message || 'Error en registro');
       }
     } catch (error) {
       alert('Error de conexión al servidor');
@@ -61,109 +62,114 @@ function Register() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-4 max-w-md mx-auto mt-10 bg-white shadow-lg rounded-lg">
-      <h2 className="text-xl font-bold text-center">Registro de cuenta</h2>
+    <div className="p-4 max-w-xl mx-auto">
+      <h1 className="text-xl font-bold mb-4">Registro</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <label>
+          Tipo de cuenta:
+          <select
+            value={tipoCuenta}
+            onChange={(e) => setTipoCuenta(e.target.value)}
+            className="ml-2 border rounded px-2 py-1"
+          >
+            <option value="mecanico">Mecánico</option>
+            <option value="vendedor">Vendedor</option>
+          </select>
+        </label>
 
-      <select
-        value={tipoCuenta}
-        onChange={(e) => setTipoCuenta(e.target.value)}
-        className="border p-2 rounded"
-      >
-        <option value="mecanico">Mecánico</option>
-        <option value="vendedor">Vendedor</option>
-      </select>
+        {tipoCuenta === 'mecanico' && (
+          <>
+            <input
+              type="text"
+              placeholder="Nombre"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              required
+              className="block w-full border rounded px-3 py-2"
+            />
+            <input
+              type="text"
+              placeholder="Apellido"
+              value={apellido}
+              onChange={(e) => setApellido(e.target.value)}
+              required
+              className="block w-full border rounded px-3 py-2"
+            />
+            <label>
+              Certificado de estudio (opcional):
+              <input
+                type="file"
+                accept="image/*,.pdf"
+                onChange={(e) => setCertificadoFile(e.target.files[0])}
+                className="block"
+              />
+            </label>
+          </>
+        )}
 
-      {tipoCuenta === 'vendedor' && (
+        {tipoCuenta === 'vendedor' && (
+          <>
+            <input
+              type="text"
+              placeholder="Nombre del local"
+              value={nombreLocal}
+              onChange={(e) => setNombreLocal(e.target.value)}
+              required
+              className="block w-full border rounded px-3 py-2"
+            />
+            <input
+              type="text"
+              placeholder="Localidad"
+              value={localidad}
+              onChange={(e) => setLocalidad(e.target.value)}
+              required
+              className="block w-full border rounded px-3 py-2"
+            />
+            <input
+              type="text"
+              placeholder="DNI"
+              value={dni}
+              onChange={(e) => setDni(e.target.value)}
+              required
+              className="block w-full border rounded px-3 py-2"
+            />
+            <label>
+              Constancia de AFIP (opcional):
+              <input
+                type="file"
+                accept="image/*,.pdf"
+                onChange={(e) => setAfipFile(e.target.files[0])}
+                className="block"
+              />
+            </label>
+          </>
+        )}
+
         <input
-          type="text"
-          placeholder="Nombre del local"
-          value={nombreLocal}
-          onChange={(e) => setNombreLocal(e.target.value)}
-          className="border p-2 rounded"
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           required
+          className="block w-full border rounded px-3 py-2"
         />
-      )}
-
-      <input
-        type="text"
-        placeholder="Nombre"
-        value={nombre}
-        onChange={(e) => setNombre(e.target.value)}
-        className="border p-2 rounded"
-        required
-      />
-
-      <input
-        type="text"
-        placeholder="Apellido"
-        value={apellido}
-        onChange={(e) => setApellido(e.target.value)}
-        className="border p-2 rounded"
-        required
-      />
-
-      <input
-        type="text"
-        placeholder="Localidad"
-        value={localidad}
-        onChange={(e) => setLocalidad(e.target.value)}
-        className="border p-2 rounded"
-        required
-      />
-
-      <input
-        type="text"
-        placeholder="DNI"
-        value={dni}
-        onChange={(e) => setDni(e.target.value)}
-        className="border p-2 rounded"
-        required
-      />
-
-      <input
-        type="email"
-        placeholder="Correo"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="border p-2 rounded"
-        required
-      />
-
-      <input
-        type="password"
-        placeholder="Contraseña"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className="border p-2 rounded"
-        required
-      />
-
-      <div>
-        <label className="block font-semibold">Constancia AFIP (opcional, se puede cargar luego):</label>
         <input
-          type="file"
-          accept="image/*,application/pdf"
-          onChange={(e) => setAfipFile(e.target.files[0])}
-          className="mt-1"
+          type="password"
+          placeholder="Contraseña"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className="block w-full border rounded px-3 py-2"
         />
-      </div>
 
-      <div>
-        <label className="block font-semibold">Certificado de estudio (opcional, se puede cargar luego):</label>
-        <input
-          type="file"
-          accept="image/*,application/pdf"
-          onChange={(e) => setCertificadoFile(e.target.files[0])}
-          className="mt-1"
-        />
-      </div>
-
-      <button type="submit" className="bg-green-600 text-white p-2 rounded">Registrarse</button>
-
-      <button type="button" className="bg-gray-500 text-white p-2 rounded" onClick={() => navigate('/')}>
-        Volver al login
-      </button>
-    </form>
+        <button
+          type="submit"
+          className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+        >
+          Registrarse
+        </button>
+      </form>
+    </div>
   );
 }
 
