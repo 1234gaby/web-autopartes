@@ -3,9 +3,6 @@ import axios from 'axios';
 
 const MiCuenta = () => {
   const [usuario, setUsuario] = useState(null);
-  const [certificadoEstudio, setCertificadoEstudio] = useState(null);
-  const [constanciaAfip, setConstanciaAfip] = useState(null);
-  const [mensaje, setMensaje] = useState('');
 
   useEffect(() => {
     const userId = localStorage.getItem('user_id');
@@ -16,32 +13,13 @@ const MiCuenta = () => {
       .catch(err => console.error('Error al cargar usuario', err));
   }, []);
 
-  const handleUpload = async (e) => {
-    e.preventDefault();
-    if (!usuario) return;
+  const handleCerrarSesion = () => {
+    localStorage.removeItem('user_id');
+    window.location.href = '/login'; // o la ruta que uses para login
+  };
 
-    const formData = new FormData();
-
-    if (usuario.tipo_cuenta === 'mecanico' && certificadoEstudio) {
-      formData.append('certificadoEstudio', certificadoEstudio);
-    }
-
-    if (usuario.tipo_cuenta === 'vendedor' && constanciaAfip) {
-      formData.append('constanciaAfip', constanciaAfip);
-    }
-
-    try {
-      const res = await axios.post(
-        `https://web-autopartes-backend.onrender.com/usuarios/${usuario.id}/documentos`,
-        formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
-      );
-      setMensaje('Documentos subidos correctamente');
-      setUsuario(res.data);
-    } catch (err) {
-      console.error('Error al subir documentos', err);
-      setMensaje('Hubo un error al subir los documentos');
-    }
+  const handleVolver = () => {
+    window.history.back();
   };
 
   if (!usuario) return <div>Cargando...</div>;
@@ -49,6 +27,7 @@ const MiCuenta = () => {
   return (
     <div className="p-4 max-w-xl mx-auto">
       <h1 className="text-xl font-bold mb-4">Mi Cuenta</h1>
+
       <p><strong>Email:</strong> {usuario.email}</p>
       <p><strong>Tipo de cuenta:</strong> {usuario.tipo_cuenta}</p>
 
@@ -56,6 +35,18 @@ const MiCuenta = () => {
         <>
           <p><strong>Nombre:</strong> {usuario.nombre}</p>
           <p><strong>Apellido:</strong> {usuario.apellido}</p>
+
+          <p><strong>Certificado de Estudio:</strong> {usuario.certificado_estudio_url 
+            ? <a href={usuario.certificado_estudio_url} target="_blank" rel="noreferrer">Ver archivo</a> 
+            : 'No subido'}</p>
+
+          <p><strong>Estado Certificado:</strong> {usuario.aprobado_certificado_estudio ? 'Aprobado' : 'Pendiente'}</p>
+
+          <p><strong>Constancia AFIP/ARCA:</strong> {usuario.constancia_afip_url 
+            ? <a href={usuario.constancia_afip_url} target="_blank" rel="noreferrer">Ver archivo</a> 
+            : 'No subido'}</p>
+
+          <p><strong>Estado Constancia AFIP/ARCA:</strong> {usuario.aprobado_constancia_afip ? 'Aprobado' : 'Pendiente'}</p>
         </>
       )}
 
@@ -64,37 +55,21 @@ const MiCuenta = () => {
           <p><strong>Nombre del local:</strong> {usuario.nombre_local}</p>
           <p><strong>Localidad:</strong> {usuario.localidad}</p>
           <p><strong>DNI:</strong> {usuario.dni}</p>
+
+          <p><strong>Constancia AFIP/ARCA:</strong> {usuario.constancia_afip_url 
+            ? <a href={usuario.constancia_afip_url} target="_blank" rel="noreferrer">Ver archivo</a> 
+            : 'No subido'}</p>
+
+          <p><strong>Estado Constancia AFIP/ARCA:</strong> {usuario.aprobado_constancia_afip ? 'Aprobado' : 'Pendiente'}</p>
         </>
       )}
 
-      <form onSubmit={handleUpload} className="mt-6 space-y-4">
-        {usuario.tipo_cuenta === 'mecanico' && (
-          <div>
-            <label>Certificado de estudio:</label>
-            <input
-              type="file"
-              onChange={(e) => setCertificadoEstudio(e.target.files[0])}
-              accept="image/*,.pdf"
-            />
-          </div>
-        )}
-
-        {usuario.tipo_cuenta === 'vendedor' && (
-          <div>
-            <label>Constancia de AFIP:</label>
-            <input
-              type="file"
-              onChange={(e) => setConstanciaAfip(e.target.files[0])}
-              accept="image/*,.pdf"
-            />
-          </div>
-        )}
-
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
-          Subir documentos
-        </button>
-        {mensaje && <p className="text-green-600">{mensaje}</p>}
-      </form>
+      <div className="mt-6 space-x-4">
+        <button onClick={handleVolver} className="bg-gray-500 text-white px-4 py-2 rounded">Volver</button>
+        <button onClick={handleCerrarSesion} className="bg-red-600 text-white px-4 py-2 rounded">Cerrar sesión</button>
+        <button onClick={() => window.location.href = '/editar-perfil'} className="bg-blue-600 text-white px-4 py-2 rounded">Editar perfil</button>
+        <button onClick={() => window.location.href = '/mis-compras'} className="bg-green-600 text-white px-4 py-2 rounded">Mis compras</button>
+      </div>
     </div>
   );
 };

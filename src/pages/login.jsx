@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Loader2 } from "lucide-react";
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const response = await fetch('https://web-autopartes-backend.onrender.com/login', {
@@ -18,10 +25,7 @@ function Login() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Login exitoso:', data);
-
         localStorage.setItem('user_id', data.user_id);
-
         navigate('/home');
       } else {
         alert('Login incorrecto');
@@ -29,71 +33,67 @@ function Login() {
     } catch (error) {
       console.error('Error al conectar con el servidor:', error);
       alert('Error de conexión al servidor');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const continuarComoInvitado = () => {
-    navigate('/home');
-  };
-
-  const irARegistro = () => {
-    navigate('/register');
-  };
+  const continuarComoInvitado = () => navigate('/home');
+  const irARegistro = () => navigate('/register');
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-6 bg-white shadow-lg rounded-lg">
-        <h2 className="text-3xl font-bold text-center mb-8">Iniciar sesión</h2>
+      <Card className="w-full max-w-md p-6">
+        <CardHeader>
+          <CardTitle className="text-3xl text-center">Iniciar sesión</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="password">Contraseña</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
+              Iniciar sesión
+            </Button>
+          </form>
 
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-            <input
-              id="email"
-              type="email"
-              className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+          <div className="mt-6 space-y-3">
+            <Button
+              variant="secondary"
+              className="w-full"
+              onClick={irARegistro}
+            >
+              Registrarse
+            </Button>
+
+            <Button
+              variant="success"
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+              onClick={continuarComoInvitado}
+            >
+              Continuar como invitado
+            </Button>
           </div>
-
-          <div className="mb-6">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Contraseña</label>
-            <input
-              id="password"
-              type="password"
-              className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            Iniciar sesión
-          </button>
-        </form>
-
-        <div className="mt-6 text-center">
-          <button
-            onClick={irARegistro}
-            className="w-full py-2 px-4 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 mb-3"
-          >
-            Registrarse
-          </button>
-
-          <button
-            onClick={continuarComoInvitado}
-            className="w-full py-2 px-4 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-          >
-            Continuar como invitado
-          </button>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
