@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion'; 
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { LoadingOverlay } from '../components/ui/LoadingOverlay';
 
 const CrearPublicacion = () => {
   const userId = localStorage.getItem('user_id');
   const navigate = useNavigate();
   const [publicacionExitosa, setPublicacionExitosa] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     nombre_producto: '',
@@ -96,6 +99,7 @@ const CrearPublicacion = () => {
     formData.fotos.forEach((file) => data.append('fotos', file));
 
     try {
+      setLoading(true);
       await axios.post('https://web-autopartes-backend.onrender.com/publicaciones', data, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -106,6 +110,8 @@ const CrearPublicacion = () => {
     } catch (error) {
       console.error(error);
       alert('Error al crear la publicación');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -124,7 +130,14 @@ const CrearPublicacion = () => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-8 bg-white shadow-lg rounded-xl border border-gray-200 dark:bg-gray-800 dark:border-gray-700 transition-all duration-500">
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="max-w-3xl mx-auto p-8 bg-white shadow-lg rounded-xl border border-gray-200 dark:bg-gray-800 dark:border-gray-700 transition-all duration-500"
+    >
+      <LoadingOverlay loading={loading} />
+
       <button
         onClick={() => navigate('/home')}
         className="mb-6 px-5 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-300 flex items-center space-x-2"
@@ -333,7 +346,7 @@ const CrearPublicacion = () => {
           Crear Publicación
         </button>
       </form>
-    </div>
+    </motion.div>
   );
 };
 
