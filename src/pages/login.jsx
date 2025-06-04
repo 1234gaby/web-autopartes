@@ -50,6 +50,7 @@ function Login() {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('user_id', data.user_id);
+        localStorage.setItem('perfil', data.tipoCuenta); // Guarda el tipo de cuenta como perfil
         navigate('/home');
       } else {
         alert('Login incorrecto');

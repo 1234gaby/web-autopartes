@@ -15,7 +15,7 @@ const MiCuenta = () => {
 
   const handleCerrarSesion = () => {
     localStorage.removeItem('user_id');
-    window.location.href = '/login'; // o la ruta que uses para login
+    window.location.href = '/'; // o la ruta que uses para login
   };
 
   const handleVolver = () => {
@@ -70,6 +70,14 @@ const MiCuenta = () => {
           </p>
 
           <p className="mb-4 text-gray-700 dark:text-gray-300"><strong>Estado Constancia AFIP/ARCA:</strong> {usuario.aprobado_constancia_afip ? 'Aprobado' : 'Pendiente'}</p>
+          
+          <button
+            onClick={() => window.location.href = '/mis-publicaciones'}
+            className="px-5 py-2 rounded bg-purple-600 text-white hover:bg-purple-700 transition"
+            type="button"        
+          >
+            Mis publicaciones
+          </button>
         </>
       )}
 

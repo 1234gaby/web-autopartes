@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 
 import { Button } from '../components/ui/button';
 import { Label } from '../components/ui/label';
-import { Select } from '../components/ui/select'; // tu componente Select personalizado
+import { Select } from '../components/ui/select';
 import { LoadingOverlay } from '../components/ui/LoadingOverlay';
 
 const modelosPorMarca = {
@@ -33,6 +33,13 @@ function Home() {
   const [orden, setOrden] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const userId = localStorage.getItem('user_id');
+  // Asegura que perfil nunca sea null ni undefined ni string vacío
+  let perfil = localStorage.getItem('perfil');
+  if (perfil === null || perfil === undefined) perfil = '';
+  // Normaliza el perfil para evitar problemas de mayúsculas/minúsculas y espacios
+  const esMecanico = perfil && perfil.toString().toLowerCase().trim() === 'mecanico';
+
   useEffect(() => {
     const fetchPublicaciones = async () => {
       setLoading(true);
@@ -51,7 +58,7 @@ function Home() {
   const handleFiltroChange = (e) => {
     const { name, value } = e.target;
     if (name === 'marca') {
-      setFiltros({ ...filtros, marca: value, modelo: '' }); // resetear modelo si cambia marca
+      setFiltros({ ...filtros, marca: value, modelo: '' });
     } else {
       setFiltros({ ...filtros, [name]: value });
     }
@@ -81,39 +88,58 @@ function Home() {
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
         <h1 className="text-3xl font-extrabold">Publicaciones</h1>
         <div className="flex flex-wrap gap-3">
-          <Button
-            variant="primary"
-            onClick={() => navigate('/crearpublicacion')}
-            className="min-w-[140px]"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            as={motion.button}
-          >
-            Crear Publicación
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={() => navigate('/micuenta')}
-            className="min-w-[120px]"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            as={motion.button}
-          >
-            Mi Cuenta
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={() => {
-              localStorage.removeItem('user_id');
-              navigate('/');
-            }}
-            className="min-w-[120px]"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            as={motion.button}
-          >
-            Cerrar sesión
-          </Button>
+          {userId ? (
+            <>
+              {/* Solo muestra el botón si el perfil NO es "mecanico" */}
+              {!esMecanico && (
+                <Button
+                  variant="primary"
+                  onClick={() => navigate('/crearpublicacion')}
+                  className="min-w-[140px]"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  as={motion.button}
+                >
+                  Crear Publicación
+                </Button>
+              )}
+              <Button
+                variant="secondary"
+                onClick={() => navigate('/micuenta')}
+                className="min-w-[120px]"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                as={motion.button}
+              >
+                Mi Cuenta
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  localStorage.removeItem('user_id');
+                  localStorage.removeItem('perfil');
+                  navigate('/');
+                }}
+                className="min-w-[120px]"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                as={motion.button}
+              >
+                Cerrar sesión
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant="primary"
+              onClick={() => navigate('/')}
+              className="min-w-[140px]"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              as={motion.button}
+            >
+              Iniciar sesión
+            </Button>
+          )}
         </div>
       </div>
 
@@ -256,8 +282,14 @@ function Home() {
                 <h2 className="text-xl font-semibold truncate">{pub.nombre_producto}</h2>
                 <p><strong>Marca:</strong> {pub.marca}</p>
                 <p><strong>Modelo:</strong> {pub.modelo}</p>
-                <p><strong>Precio:</strong> ${pub.precio.toLocaleString('es-AR')}</p>
-                <p><strong>Ubicación:</strong> {pub.ubicacion}</p>
+                <p>
+                  <strong>Precio:</strong>{' '}
+                  {userId ? `$${pub.precio.toLocaleString('es-AR')}` : 'Iniciar sesión para ver'}
+                </p>
+                <p>
+                  <strong>Ubicación:</strong>{' '}
+                  {userId ? pub.ubicacion : 'Iniciar sesión para ver'}
+                </p>
                 <p><strong>Estado:</strong> {pub.estado.charAt(0).toUpperCase() + pub.estado.slice(1)}</p>
                 <p><strong>Envío:</strong> {pub.envio === 'si' ? pub.tipo_envio : 'No'}</p>
               </div>
