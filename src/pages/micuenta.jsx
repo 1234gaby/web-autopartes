@@ -40,7 +40,7 @@ const MiCuenta = () => {
             <strong>Certificado de Estudio:</strong>{' '}
             {usuario.certificado_estudio_url
               ? <a href={usuario.certificado_estudio_url} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">Ver archivo</a>
-              : 'No subido'}
+              : 'No cargado'}
           </p>
 
           <p className="mb-2 text-gray-700 dark:text-gray-300"><strong>Estado Certificado:</strong> {usuario.aprobado_certificado_estudio ? 'Aprobado' : 'Pendiente'}</p>
@@ -49,7 +49,7 @@ const MiCuenta = () => {
             <strong>Constancia AFIP/ARCA:</strong>{' '}
             {usuario.constancia_afip_url
               ? <a href={usuario.constancia_afip_url} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">Ver archivo</a>
-              : 'No subido'}
+              : 'No cargado'}
           </p>
 
           <p className="mb-4 text-gray-700 dark:text-gray-300"><strong>Estado Constancia AFIP/ARCA:</strong> {usuario.aprobado_constancia_afip ? 'Aprobado' : 'Pendiente'}</p>
