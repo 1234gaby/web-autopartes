@@ -11,6 +11,11 @@ import { LoadingOverlay } from '../components/ui/LoadingOverlay';
 // Igual que en login.jsx: motion.create para que funcione bien la animación en Button
 const MotionButton = motion.create(Button);
 
+const localidadesBrown = [
+  'Adrogué', 'Burzaco', 'Claypole', 'Don Orione', 'Glew', 'José Mármol',
+  'Longchamps', 'Malvinas Argentinas', 'Ministro Rivadavia', 'Rafael Calzada', 'San José', 'Solano'
+];
+
 function Register() {
   const [tipoCuenta, setTipoCuenta] = useState('mecanico');
   const [nombre, setNombre] = useState('');
@@ -168,15 +173,18 @@ function Register() {
 
               <div>
                 <Label htmlFor="localidad" className="text-gray-900 dark:text-gray-100">Localidad</Label>
-                <Input
+                <select
                   id="localidad"
                   required
-                  autoComplete="address-level2"
                   value={localidad}
                   onChange={(e) => setLocalidad(e.target.value)}
-                  placeholder="Localidad"
-                  className="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                />
+                  className="w-full mt-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Seleccionar localidad</option>
+                  {localidadesBrown.map(loc => (
+                    <option key={loc} value={loc}>{loc}</option>
+                  ))}
+                </select>
               </div>
 
               <div>
