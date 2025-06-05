@@ -49,6 +49,16 @@ const MiCuenta = () => {
 
   const esVendedor = usuario.tipo_cuenta === 'vendedor';
 
+  // Mostrar cashback correctamente aunque sea null, string o undefined
+  let cashbackMostrado = '0.00';
+  if (
+    usuario.cashback !== null &&
+    usuario.cashback !== undefined &&
+    !isNaN(Number(usuario.cashback))
+  ) {
+    cashbackMostrado = Number(usuario.cashback).toFixed(2);
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -79,6 +89,10 @@ const MiCuenta = () => {
             {esVendedor && (
               <p><strong>Nombre del local:</strong> {usuario.nombre_local || '-'}</p>
             )}
+            {/* Mostrar cashback */}
+            <p>
+              <strong>Cashback acumulado:</strong> ${cashbackMostrado}
+            </p>
           </div>
 
           <div className="mb-6 space-y-2 text-gray-700 dark:text-gray-300 pt-4 border-t border-gray-300 dark:border-gray-700">

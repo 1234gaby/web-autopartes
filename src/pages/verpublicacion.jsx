@@ -223,7 +223,7 @@ const VerPublicacion = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg text-lg shadow-lg"
-                onClick={() => alert('Funcionalidad de compra próximamente')}
+                onClick={() => navigate(`/compra/${publicacion.id}`)}
               >
                 Comprar
               </MotionButton>
