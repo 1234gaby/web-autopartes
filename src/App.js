@@ -10,7 +10,8 @@ import Recuperacion from './pages/recuperacion';
 import RecuperacionContraseña from './pages/recuperacioncontraseña';
 import EditarPerfil from './pages/editarperfil';
 import MisPublicaciones from './pages/mispublicaciones';
-import EditarPublicacion from './pages/editarpublicacion'; // <-- Agregado
+import EditarPublicacion from './pages/editarpublicacion';
+import VerPublicacion from './pages/verpublicacion'; // <-- Agregado
 
 function App() {
   return (
@@ -26,7 +27,8 @@ function App() {
         <Route path="/recuperacion/recuperacion" element={<RecuperacionContraseña />} />
         <Route path="/editar-perfil" element={<EditarPerfil />} />
         <Route path="/mis-publicaciones" element={<MisPublicaciones />} />
-        <Route path="/editar-publicacion/:id" element={<EditarPublicacion />} /> {/* <-- Agregado */}
+        <Route path="/editar-publicacion/:id" element={<EditarPublicacion />} />
+        <Route path="/publicacion/:id" element={<VerPublicacion />} /> {/* <-- Nueva ruta */}
       </Routes>
     </BrowserRouter>
   );
