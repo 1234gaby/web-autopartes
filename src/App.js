@@ -6,7 +6,7 @@ import Home from './pages/home';
 import RegisterSuccess from './pages/registersuccess';
 import CrearPublicacion from './pages/crearpublicacion';
 import MiCuenta from './pages/micuenta';
-import Recuperacion from './pages/recuperacion'; // 👈 Importar la nueva página
+import Recuperacion from './pages/recuperacion';
 
 function App() {
   return (
@@ -18,7 +18,7 @@ function App() {
         <Route path="/registersuccess" element={<RegisterSuccess />} />
         <Route path="/crearpublicacion" element={<CrearPublicacion />} />
         <Route path="/micuenta" element={<MiCuenta />} />
-        <Route path="/recuperacion" element={<Recuperacion />} /> {/* 👈 Nueva ruta */}
+        <Route path="/recuperacion" element={<Recuperacion />} />
       </Routes>
     </BrowserRouter>
   );
