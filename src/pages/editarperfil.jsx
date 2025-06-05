@@ -17,6 +17,7 @@ const EditarPerfil = () => {
   const [apellido, setApellido] = useState('');
   const [email, setEmail] = useState('');
   const [contrasena, setContrasena] = useState('');
+  const [telefono, setTelefono] = useState('');
   const [nombreLocal, setNombreLocal] = useState('');
   const [afipFile, setAfipFile] = useState(null);
   const [certificadoEstudio, setCertificadoEstudio] = useState(null);
@@ -36,6 +37,7 @@ const EditarPerfil = () => {
         setApellido(res.data.apellido || '');
         setEmail(res.data.email || '');
         setContrasena(res.data.contrasena || res.data.password || '');
+        setTelefono(res.data.telefono || '');
         setNombreLocal(res.data.nombre_local || '');
       })
       .catch(err => console.error('Error al cargar usuario', err))
@@ -52,6 +54,7 @@ const EditarPerfil = () => {
     formData.append('apellido', apellido);
     formData.append('email', email);
     formData.append('contrasena', contrasena);
+    formData.append('telefono', telefono);
     if (usuario.tipo_cuenta === 'vendedor') {
       formData.append('nombre_local', nombreLocal);
     }
@@ -152,6 +155,26 @@ const EditarPerfil = () => {
                   onChange={e => setApellido(e.target.value)}
                   placeholder="Apellido"
                   className="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                />
+              </div>
+              <div>
+                <Label htmlFor="telefono" className="text-gray-900 dark:text-gray-100">Teléfono</Label>
+                <Input
+                  id="telefono"
+                  required
+                  type="tel"
+                  pattern="[0-9]{6,20}"
+                  inputMode="tel"
+                  value={telefono}
+                  onChange={e => {
+                    // Solo permite números
+                    const val = e.target.value.replace(/\D/g, '');
+                    setTelefono(val);
+                  }}
+                  placeholder="Ej: 1122334455"
+                  className="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  maxLength={20}
+                  minLength={6}
                 />
               </div>
               <div>

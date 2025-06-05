@@ -23,6 +23,7 @@ function Register() {
   const [nombreLocal, setNombreLocal] = useState('');
   const [localidad, setLocalidad] = useState('');
   const [dni, setDni] = useState('');
+  const [telefono, setTelefono] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [afipFile, setAfipFile] = useState(null);
@@ -60,6 +61,7 @@ function Register() {
     formData.append('apellido', apellido);
     formData.append('localidad', localidad);
     formData.append('dni', dni);
+    formData.append('telefono', telefono); // <-- AGREGADO
     formData.append('email', email);
     formData.append('password', password);
 
@@ -196,6 +198,27 @@ function Register() {
                   onChange={(e) => setDni(e.target.value)}
                   placeholder="DNI"
                   className="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="telefono" className="text-gray-900 dark:text-gray-100">Teléfono</Label>
+                <Input
+                  id="telefono"
+                  required
+                  type="tel"
+                  pattern="[0-9]{6,20}"
+                  inputMode="tel"
+                  value={telefono}
+                  onChange={e => {
+                    // Solo permite números
+                    const val = e.target.value.replace(/\D/g, '');
+                    setTelefono(val);
+                  }}
+                  placeholder="Ej: 1122334455"
+                  className="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  maxLength={20}
+                  minLength={6}
                 />
               </div>
 

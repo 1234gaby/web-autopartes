@@ -15,6 +15,9 @@ const VerPublicacion = () => {
   const [imgSeleccionada, setImgSeleccionada] = useState(0);
   const [modalAbierto, setModalAbierto] = useState(false);
 
+  // Detectar si el usuario está logueado
+  const userId = localStorage.getItem('user_id');
+
   useEffect(() => {
     setLoading(true);
     fetch(`https://web-autopartes-backend.onrender.com/publicaciones/${id}`)
@@ -121,7 +124,7 @@ const VerPublicacion = () => {
             </h2>
             <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
               <span className="inline-block text-2xl md:text-3xl font-extrabold text-green-400 bg-white/90 dark:bg-gray-900/90 px-6 py-2 rounded-xl shadow-2xl border-4 border-green-400 drop-shadow-lg mb-2 md:mb-0">
-                ${precio?.toLocaleString('es-AR')}
+                {userId ? `$${precio?.toLocaleString('es-AR')}` : 'Iniciar sesión para ver'}
               </span>
               <span className="inline-block text-base bg-blue-600 text-white px-4 py-2 rounded-full shadow font-semibold uppercase tracking-wider">
                 {categoria}
@@ -166,7 +169,7 @@ const VerPublicacion = () => {
                 <strong>Estado:</strong> {estado?.charAt(0).toUpperCase() + estado?.slice(1)}
               </span>
               <span className="bg-gray-200 dark:bg-gray-700 rounded px-3 py-1 text-sm">
-                <strong>Ubicación:</strong> {ubicacion}
+                <strong>Ubicación:</strong> {userId ? ubicacion : 'Iniciar sesión para ver'}
               </span>
               <span className="bg-gray-200 dark:bg-gray-700 rounded px-3 py-1 text-sm">
                 <strong>Envío:</strong> {envio === 'si' ? tipo_envio : 'No'}
@@ -201,28 +204,47 @@ const VerPublicacion = () => {
               </div>
             )}
           </div>
-          <div className="md:w-1/2 flex flex-col gap-4">
-            <div className="bg-blue-50 dark:bg-blue-900/40 rounded-lg p-4 shadow">
-              <span className="font-semibold text-blue-700 dark:text-blue-300">Vendedor</span>
-              <div className="ml-2 mt-1">
-                {vendedor?.nombre_local && (
-                  <p className="text-sm text-blue-800 dark:text-blue-200 font-bold">
-                    <strong></strong> {vendedor.nombre_local}
-                  </p>
-                )}
-                {/* No mostrar nombre, apellido ni email */}
+          {/* Mostrar vendedor y botón solo si está logueado */}
+          {userId ? (
+            <div className="md:w-1/2 flex flex-col gap-4">
+              <div className="bg-blue-50 dark:bg-blue-900/40 rounded-lg p-4 shadow">
+                <span className="font-semibold text-blue-700 dark:text-blue-300">Vendedor</span>
+                <div className="ml-2 mt-1">
+                  {vendedor?.nombre_local && (
+                    <p className="text-sm text-blue-800 dark:text-blue-200 font-bold">
+                      {vendedor.nombre_local}
+                    </p>
+                  )}
+                  {/* No mostrar nombre, apellido ni email */}
+                </div>
               </div>
+              <MotionButton
+                type="button"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg text-lg shadow-lg"
+                onClick={() => alert('Funcionalidad de compra próximamente')}
+              >
+                Comprar
+              </MotionButton>
             </div>
-            <MotionButton
-              type="button"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg text-lg shadow-lg"
-              onClick={() => alert('Funcionalidad de compra próximamente')}
-            >
-              Comprar
-            </MotionButton>
-          </div>
+          ) : (
+            <div className="md:w-1/2 flex flex-col gap-4 items-center justify-center">
+              <div className="bg-blue-50 dark:bg-blue-900/40 rounded-lg p-4 shadow w-full text-center">
+                <span className="font-semibold text-blue-700 dark:text-blue-300 block mb-2">Vendedor</span>
+                <span className="text-gray-500 dark:text-gray-400">Iniciar sesión para ver</span>
+              </div>
+              <MotionButton
+                type="button"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full mt-2 bg-gray-400 cursor-not-allowed text-white font-bold py-3 rounded-lg text-lg shadow-lg"
+                disabled
+              >
+                Iniciar sesión para ver
+              </MotionButton>
+            </div>
+          )}
         </div>
 
         <div className="flex gap-3 mt-4 mb-4 justify-end px-8">
