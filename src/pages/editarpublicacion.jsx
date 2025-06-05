@@ -9,15 +9,37 @@ import axios from 'axios';
 
 const MotionButton = motion.create(Button);
 
+const modelosPorMarca = {
+  ford: ['Fiesta', 'Focus', 'Mondeo', 'Ranger'],
+  fiat: ['Palio', 'Punto', 'Siena', 'Cronos'],
+  chevrolet: ['Corsa', 'Corsa Classic', 'Cruze', 'Onix'],
+  volkswagen: ['Gol', 'Polo', 'Bora', 'Vento', 'Amarok'],
+};
+
+const localidadesBrown = [
+  'Adrogué', 'Burzaco', 'Claypole', 'Don Orione', 'Glew', 'José Mármol',
+  'Longchamps', 'Malvinas Argentinas', 'Ministro Rivadavia', 'Rafael Calzada', 'San José', 'Solano'
+];
+
+const categorias = [
+  'Motor', 'Frenos', 'Suspensión', 'Transmisión', 'Carrocería',
+  'Electricidad', 'Interior', 'Escapes', 'Luces', 'Accesorios'
+];
+
+const estados = ['nuevo', 'usado'];
+
 const EditarPublicacion = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [publicacion, setPublicacion] = useState(null);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({});
+  const [modelosDisponibles, setModelosDisponibles] = useState([]);
   const [imagenes, setImagenes] = useState([]);
   const [imagenesAEliminar, setImagenesAEliminar] = useState([]);
   const [nuevasImagenes, setNuevasImagenes] = useState([]);
+  const [compatibilidad, setCompatibilidad] = useState([]);
+  const [compatTemp, setCompatTemp] = useState({ marca: '', modelo: '' });
 
   useEffect(() => {
     setLoading(true);
@@ -32,15 +54,47 @@ const EditarPublicacion = () => {
           ubicacion: res.data.ubicacion || '',
           categoria: res.data.categoria || '',
           estado: res.data.estado || '',
+          codigo_serie: res.data.codigo_serie || '',
+          marca_repuesto: res.data.marca_repuesto || '',
         });
         setImagenes(Array.isArray(res.data.fotos) ? res.data.fotos : []);
+        setModelosDisponibles(modelosPorMarca[res.data.marca] || []);
+        setCompatibilidad(Array.isArray(res.data.compatibilidad) ? res.data.compatibilidad : []);
       })
       .catch(() => alert('Error al cargar la publicación'))
       .finally(() => setLoading(false));
   }, [id]);
 
   const handleInputChange = e => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === 'marca') {
+      setForm({ ...form, marca: value, modelo: '' });
+      setModelosDisponibles(modelosPorMarca[value] || []);
+    } else {
+      setForm({ ...form, [name]: value });
+    }
+  };
+
+  // Compatibilidad
+  const handleCompatMarca = e => {
+    setCompatTemp({ marca: e.target.value, modelo: '' });
+  };
+  const handleCompatModelo = e => {
+    setCompatTemp(prev => ({ ...prev, modelo: e.target.value }));
+  };
+  const agregarCompatibilidad = () => {
+    if (compatTemp.marca && compatTemp.modelo) {
+      const yaExiste = compatibilidad.some(
+        c => c.marca === compatTemp.marca && c.modelo === compatTemp.modelo
+      );
+      if (!yaExiste) {
+        setCompatibilidad([...compatibilidad, compatTemp]);
+        setCompatTemp({ marca: '', modelo: '' });
+      }
+    }
+  };
+  const eliminarCompatibilidad = idx => {
+    setCompatibilidad(compatibilidad.filter((_, i) => i !== idx));
   };
 
   const handleEliminarImagen = (imgUrl) => {
@@ -61,6 +115,7 @@ const EditarPublicacion = () => {
 
     const formData = new FormData();
     Object.entries(form).forEach(([k, v]) => formData.append(k, v));
+    formData.append('compatibilidad', JSON.stringify(compatibilidad));
     nuevasImagenes.forEach(img => formData.append('nuevasFotos', img));
     formData.append('imagenesAEliminar', JSON.stringify(imagenesAEliminar));
 
@@ -106,37 +161,182 @@ const EditarPublicacion = () => {
         </h2>
 
         <div>
-          <Label>Nombre del producto</Label>
-          <Input name="nombre_producto" value={form.nombre_producto} onChange={handleInputChange} required />
+          <Label className="text-gray-900 dark:text-gray-100">Nombre del producto</Label>
+          <Input
+            name="nombre_producto"
+            value={form.nombre_producto}
+            onChange={handleInputChange}
+            required
+            className="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+          />
         </div>
         <div>
-          <Label>Marca</Label>
-          <Input name="marca" value={form.marca} onChange={handleInputChange} required />
+          <Label className="text-gray-900 dark:text-gray-100">Marca</Label>
+          <select
+            name="marca"
+            value={form.marca}
+            onChange={handleInputChange}
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+          >
+            <option value="">Seleccionar marca</option>
+            {Object.keys(modelosPorMarca).map(m => (
+              <option key={m} value={m}>{m.charAt(0).toUpperCase() + m.slice(1)}</option>
+            ))}
+          </select>
         </div>
         <div>
-          <Label>Modelo</Label>
-          <Input name="modelo" value={form.modelo} onChange={handleInputChange} required />
+          <Label className="text-gray-900 dark:text-gray-100">Modelo</Label>
+          <select
+            name="modelo"
+            value={form.modelo}
+            onChange={handleInputChange}
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            disabled={!form.marca}
+          >
+            <option value="">Seleccionar modelo</option>
+            {modelosDisponibles.map(mod => (
+              <option key={mod} value={mod}>{mod}</option>
+            ))}
+          </select>
         </div>
         <div>
-          <Label>Precio</Label>
-          <Input name="precio" type="number" value={form.precio} onChange={handleInputChange} required />
+          <Label className="text-gray-900 dark:text-gray-100">Precio</Label>
+          <Input
+            name="precio"
+            type="number"
+            value={form.precio}
+            onChange={handleInputChange}
+            required
+            className="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+          />
         </div>
         <div>
-          <Label>Ubicación</Label>
-          <Input name="ubicacion" value={form.ubicacion} onChange={handleInputChange} required />
+          <Label className="text-gray-900 dark:text-gray-100">Ubicación</Label>
+          <select
+            name="ubicacion"
+            value={form.ubicacion}
+            onChange={handleInputChange}
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+          >
+            <option value="">Seleccionar localidad</option>
+            {localidadesBrown.map(loc => (
+              <option key={loc} value={loc}>{loc}</option>
+            ))}
+          </select>
         </div>
         <div>
-          <Label>Categoría</Label>
-          <Input name="categoria" value={form.categoria} onChange={handleInputChange} required />
+          <Label className="text-gray-900 dark:text-gray-100">Categoría</Label>
+          <select
+            name="categoria"
+            value={form.categoria}
+            onChange={handleInputChange}
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+          >
+            <option value="">Seleccionar categoría</option>
+            {categorias.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
         </div>
         <div>
-          <Label>Estado</Label>
-          <Input name="estado" value={form.estado} onChange={handleInputChange} required />
+          <Label className="text-gray-900 dark:text-gray-100">Estado</Label>
+          <select
+            name="estado"
+            value={form.estado}
+            onChange={handleInputChange}
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+          >
+            <option value="">Seleccionar estado</option>
+            {estados.map(est => (
+              <option key={est} value={est}>{est.charAt(0).toUpperCase() + est.slice(1)}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <Label className="text-gray-900 dark:text-gray-100">Código de serie</Label>
+          <Input
+            name="codigo_serie"
+            value={form.codigo_serie}
+            onChange={handleInputChange}
+            className="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+          />
+        </div>
+        <div>
+          <Label className="text-gray-900 dark:text-gray-100">Marca/Fabricante del repuesto</Label>
+          <Input
+            name="marca_repuesto"
+            value={form.marca_repuesto}
+            onChange={handleInputChange}
+            className="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+          />
+        </div>
+
+        {/* Compatibilidad */}
+        <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-4">
+          <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">Compatibilidad</h3>
+          <div className="flex gap-4 mb-3 flex-wrap">
+            <select
+              value={compatTemp.marca}
+              onChange={handleCompatMarca}
+              className="flex-1 min-w-[120px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 transition duration-300"
+            >
+              <option value="">Marca</option>
+              {Object.keys(modelosPorMarca).map(m => (
+                <option key={m} value={m}>{m.charAt(0).toUpperCase() + m.slice(1)}</option>
+              ))}
+            </select>
+            <select
+              value={compatTemp.modelo}
+              onChange={handleCompatModelo}
+              disabled={!compatTemp.marca}
+              className="flex-1 min-w-[120px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 transition duration-300"
+            >
+              <option value="">Modelo</option>
+              {modelosPorMarca[compatTemp.marca]?.map(mod => (
+                <option key={mod} value={mod}>{mod}</option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={agregarCompatibilidad}
+              disabled={!compatTemp.marca || !compatTemp.modelo}
+              className={`px-5 py-2 rounded-md font-semibold text-white transition duration-300
+                ${(!compatTemp.marca || !compatTemp.modelo)
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-green-600 hover:bg-green-700'}
+              `}
+            >
+              Agregar
+            </button>
+          </div>
+          {compatibilidad.length > 0 && (
+            <ul className="list-disc list-inside max-h-32 overflow-auto text-gray-800 dark:text-gray-200">
+              {compatibilidad.map(({ marca, modelo }, i) => (
+                <li key={`${marca}-${modelo}-${i}`} className="flex items-center justify-between">
+                  <span>
+                    {marca.charAt(0).toUpperCase() + marca.slice(1)} - {modelo}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => eliminarCompatibilidad(i)}
+                    className="ml-2 px-2 py-1 bg-red-600 text-white rounded text-xs"
+                  >
+                    Quitar
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         {/* Imágenes actuales */}
         <div>
-          <Label>Imágenes actuales</Label>
+          <Label className="text-gray-900 dark:text-gray-100">Imágenes actuales</Label>
           <div className="flex flex-wrap gap-2 mt-2">
             {imagenes.filter(img => !imagenesAEliminar.includes(img)).map((img, idx) => (
               <div key={idx} className="relative">
@@ -160,13 +360,13 @@ const EditarPublicacion = () => {
 
         {/* Nuevas imágenes */}
         <div>
-          <Label>Agregar nuevas imágenes</Label>
+          <Label className="text-gray-900 dark:text-gray-100">Agregar nuevas imágenes</Label>
           <input
             type="file"
             multiple
             accept=".jpg,.jpeg,.png"
             onChange={handleNuevaImagen}
-            className="w-full mt-1 text-gray-900 dark:text-gray-100"
+            className="w-full mt-1 text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-700"
           />
           {nuevasImagenes.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">

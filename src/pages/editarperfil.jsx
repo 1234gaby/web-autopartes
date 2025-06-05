@@ -17,6 +17,7 @@ const EditarPerfil = () => {
   const [apellido, setApellido] = useState('');
   const [email, setEmail] = useState('');
   const [contrasena, setContrasena] = useState('');
+  const [nombreLocal, setNombreLocal] = useState('');
   const [afipFile, setAfipFile] = useState(null);
   const [certificadoEstudio, setCertificadoEstudio] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -35,6 +36,7 @@ const EditarPerfil = () => {
         setApellido(res.data.apellido || '');
         setEmail(res.data.email || '');
         setContrasena(res.data.contrasena || res.data.password || '');
+        setNombreLocal(res.data.nombre_local || '');
       })
       .catch(err => console.error('Error al cargar usuario', err))
       .finally(() => setLoading(false));
@@ -50,9 +52,13 @@ const EditarPerfil = () => {
     formData.append('apellido', apellido);
     formData.append('email', email);
     formData.append('contrasena', contrasena);
-
+    if (usuario.tipo_cuenta === 'vendedor') {
+      formData.append('nombre_local', nombreLocal);
+    }
     if (afipFile) formData.append('constanciaAfip', afipFile);
-    if (certificadoEstudio) formData.append('certificadoEstudio', certificadoEstudio);
+    if (certificadoEstudio && usuario.tipo_cuenta !== 'vendedor') {
+      formData.append('certificadoEstudio', certificadoEstudio);
+    }
 
     try {
       const res = await fetch(`https://web-autopartes-backend.onrender.com/usuarios/${usuario.id}`, {
@@ -84,6 +90,8 @@ const EditarPerfil = () => {
       </div>
     );
   }
+
+  const esVendedor = usuario.tipo_cuenta === 'vendedor';
 
   return (
     <motion.div
@@ -170,6 +178,18 @@ const EditarPerfil = () => {
                   className="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 />
               </div>
+              {esVendedor && (
+                <div>
+                  <Label htmlFor="nombre_local" className="text-gray-900 dark:text-gray-100">Nombre del local</Label>
+                  <Input
+                    id="nombre_local"
+                    value={nombreLocal}
+                    onChange={e => setNombreLocal(e.target.value)}
+                    placeholder="Nombre del local"
+                    className="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  />
+                </div>
+              )}
 
               {/* Carga de archivos */}
               <div>
@@ -191,25 +211,27 @@ const EditarPerfil = () => {
                   </div>
                 )}
               </div>
-              <div>
-                <Label htmlFor="certificadoEstudio" className="text-gray-900 dark:text-gray-100">
-                  Certificado de estudio (opcional)
-                </Label>
-                <input
-                  id="certificadoEstudio"
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={e => setCertificadoEstudio(e.target.files[0])}
-                  className="w-full mt-1 text-gray-900 dark:text-gray-100"
-                />
-                {usuario.certificado_estudio_url && (
-                  <div className="mt-1">
-                    <a href={usuario.certificado_estudio_url} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline text-sm">
-                      Ver archivo actual
-                    </a>
-                  </div>
-                )}
-              </div>
+              {!esVendedor && (
+                <div>
+                  <Label htmlFor="certificadoEstudio" className="text-gray-900 dark:text-gray-100">
+                    Certificado de estudio (opcional)
+                  </Label>
+                  <input
+                    id="certificadoEstudio"
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={e => setCertificadoEstudio(e.target.files[0])}
+                    className="w-full mt-1 text-gray-900 dark:text-gray-100"
+                  />
+                  {usuario.certificado_estudio_url && (
+                    <div className="mt-1">
+                      <a href={usuario.certificado_estudio_url} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline text-sm">
+                        Ver archivo actual
+                      </a>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <MotionButton
                 type="submit"

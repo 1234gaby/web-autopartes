@@ -5,7 +5,6 @@ import { Button } from '../components/ui/button';
 import { LoadingOverlay } from '../components/ui/LoadingOverlay';
 import axios from 'axios';
 
-
 const MotionButton = motion.create(Button);
 
 const MiCuenta = () => {
@@ -32,7 +31,7 @@ const MiCuenta = () => {
   };
 
   const handleVolver = () => {
-    navigate(-1);
+    navigate('/home');
   };
 
   if (!usuario) return (
@@ -47,6 +46,8 @@ const MiCuenta = () => {
   const afipAprobada = usuario.constancia_afip_aprobada === true ? 'SI' : 'NO';
   const estudioCargado = usuario.certificado_estudio_url ? 'SI' : 'NO';
   const estudioAprobado = usuario.certificado_estudio_aprobado === true ? 'SI' : 'NO';
+
+  const esVendedor = usuario.tipo_cuenta === 'vendedor';
 
   return (
     <motion.div
@@ -74,6 +75,9 @@ const MiCuenta = () => {
             <p><strong>Apellido:</strong> {usuario.apellido}</p>
             <p><strong>Email:</strong> {usuario.email}</p>
             <p><strong>Tipo de cuenta:</strong> {usuario.tipo_cuenta}</p>
+            {esVendedor && (
+              <p><strong>Nombre del local:</strong> {usuario.nombre_local || '-'}</p>
+            )}
           </div>
 
           <div className="mb-6 space-y-2 text-gray-700 dark:text-gray-300 pt-4 border-t border-gray-300 dark:border-gray-700">
@@ -83,12 +87,16 @@ const MiCuenta = () => {
             <p>
               <strong>Constancia de AFIP / ARCA aprobada:</strong> {afipAprobada}
             </p>
-            <p>
-              <strong>Certificado de estudio cargado:</strong> {estudioCargado}
-            </p>
-            <p>
-              <strong>Certificado de estudio aprobado:</strong> {estudioAprobado}
-            </p>
+            {!esVendedor && (
+              <>
+                <p>
+                  <strong>Certificado de estudio cargado:</strong> {estudioCargado}
+                </p>
+                <p>
+                  <strong>Certificado de estudio aprobado:</strong> {estudioAprobado}
+                </p>
+              </>
+            )}
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3">
@@ -132,15 +140,17 @@ const MiCuenta = () => {
               Mis compras
             </MotionButton>
 
-            <MotionButton
-              onClick={() => navigate('/mis-publicaciones')}
-              className="px-5 py-2 rounded bg-purple-600 text-white hover:bg-purple-700 transition"
-              type="button"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Mis publicaciones
-            </MotionButton>
+            {esVendedor && (
+              <MotionButton
+                onClick={() => navigate('/mis-publicaciones')}
+                className="px-5 py-2 rounded bg-purple-600 text-white hover:bg-purple-700 transition"
+                type="button"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Mis publicaciones
+              </MotionButton>
+            )}
           </div>
         </div>
       </motion.div>
