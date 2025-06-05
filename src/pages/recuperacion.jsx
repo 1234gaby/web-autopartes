@@ -40,7 +40,7 @@ export default function Recuperacion() {
     setLoading(true);
     setMensaje('');
     try {
-      const res = await fetch('https://web-autopartes-backend.onrender.com/recuperacion', {
+      const res = await fetch('https://web-autopartes-backend.onrender.com/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, dni }),
