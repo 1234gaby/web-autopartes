@@ -32,12 +32,11 @@ function Home() {
   });
   const [orden, setOrden] = useState('');
   const [loading, setLoading] = useState(false);
+  const [busqueda, setBusqueda] = useState('');
 
   const userId = localStorage.getItem('user_id');
-  // Asegura que perfil nunca sea null ni undefined ni string vacío
   let perfil = localStorage.getItem('perfil');
   if (perfil === null || perfil === undefined) perfil = '';
-  // Normaliza el perfil para evitar problemas de mayúsculas/minúsculas y espacios
   const esMecanico = perfil && perfil.toString().toLowerCase().trim() === 'mecanico';
 
   useEffect(() => {
@@ -64,15 +63,45 @@ function Home() {
     }
   };
 
+  // Buscador avanzado: nombre, ubicación, modelo, modelos compatibles
   const filtrarPublicaciones = () => {
     return publicaciones
-      .filter(pub => (
-        (!filtros.marca || pub.marca === filtros.marca) &&
-        (!filtros.modelo || pub.modelo === filtros.modelo) &&
-        (!filtros.ubicacion || pub.ubicacion === filtros.ubicacion) &&
-        (!filtros.envio || pub.envio === filtros.envio) &&
-        (!filtros.estado || pub.estado === filtros.estado)
-      ))
+      .filter(pub => {
+        // Filtros select
+        const filtroMarca = !filtros.marca || pub.marca === filtros.marca;
+        const filtroModelo = !filtros.modelo || pub.modelo === filtros.modelo;
+        const filtroUbicacion = !filtros.ubicacion || pub.ubicacion === filtros.ubicacion;
+        const filtroEnvio = !filtros.envio || pub.envio === filtros.envio;
+        const filtroEstado = !filtros.estado || pub.estado === filtros.estado;
+
+        // Buscador: nombre, ubicación, modelo, modelos compatibles
+        const texto = busqueda.trim().toLowerCase();
+        if (!texto) {
+          return filtroMarca && filtroModelo && filtroUbicacion && filtroEnvio && filtroEstado;
+        }
+
+        // Modelos compatibles: array de objetos {marca, modelo}
+        let compatibles = '';
+        if (Array.isArray(pub.compatibilidad)) {
+          compatibles = pub.compatibilidad
+            .map(c => `${c.marca || ''} ${c.modelo || ''}`.toLowerCase())
+            .join(' ');
+        }
+
+        return (
+          filtroMarca &&
+          filtroModelo &&
+          filtroUbicacion &&
+          filtroEnvio &&
+          filtroEstado &&
+          (
+            (pub.nombre_producto && pub.nombre_producto.toLowerCase().includes(texto)) ||
+            (pub.ubicacion && pub.ubicacion.toLowerCase().includes(texto)) ||
+            (pub.modelo && pub.modelo.toLowerCase().includes(texto)) ||
+            (compatibles && compatibles.includes(texto))
+          )
+        );
+      })
       .sort((a, b) => {
         if (orden === 'precio') return a.precio - b.precio;
         if (orden === 'nombre') return a.nombre_producto.localeCompare(b.nombre_producto);
@@ -90,7 +119,6 @@ function Home() {
         <div className="flex flex-wrap gap-3">
           {userId ? (
             <>
-              {/* Solo muestra el botón si el perfil NO es "mecanico" */}
               {!esMecanico && (
                 <Button
                   variant="primary"
@@ -140,6 +168,19 @@ function Home() {
               Iniciar sesión
             </Button>
           )}
+        </div>
+      </div>
+
+      {/* Buscador alineado al área de trabajo */}
+      <div className="mb-6 flex justify-center">
+        <div className="w-full">
+          <input
+            type="text"
+            placeholder="Buscar por producto, ubicación, modelo o compatibilidad..."
+            value={busqueda}
+            onChange={e => setBusqueda(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 transition duration-300"
+          />
         </div>
       </div>
 
@@ -292,6 +333,18 @@ function Home() {
                 </p>
                 <p><strong>Estado:</strong> {pub.estado.charAt(0).toUpperCase() + pub.estado.slice(1)}</p>
                 <p><strong>Envío:</strong> {pub.envio === 'si' ? pub.tipo_envio : 'No'}</p>
+                {Array.isArray(pub.compatibilidad) && pub.compatibilidad.length > 0 && (
+                  <div className="mt-2">
+                    <strong>Compatibilidad:</strong>
+                    <ul className="list-disc list-inside text-sm">
+                      {pub.compatibilidad.map((c, i) => (
+                        <li key={i}>
+                          {c.marca ? c.marca.charAt(0).toUpperCase() + c.marca.slice(1) : ''} {c.modelo}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </motion.div>
           ))
