@@ -8,6 +8,7 @@ import CrearPublicacion from './pages/crearpublicacion';
 import MiCuenta from './pages/micuenta';
 import Recuperacion from './pages/recuperacion';
 import RecuperacionContraseña from './pages/recuperacioncontraseña';
+import EditarPerfil from './pages/editarperfil'; // <-- Agregado
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/micuenta" element={<MiCuenta />} />
         <Route path="/recuperacion" element={<Recuperacion />} />
         <Route path="/recuperacion/recuperacion" element={<RecuperacionContraseña />} />
+        <Route path="/editar-perfil" element={<EditarPerfil />} /> {/* <-- Agregado */}
       </Routes>
     </BrowserRouter>
   );
