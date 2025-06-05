@@ -7,6 +7,7 @@ import RegisterSuccess from './pages/registersuccess';
 import CrearPublicacion from './pages/crearpublicacion';
 import MiCuenta from './pages/micuenta';
 import Recuperacion from './pages/recuperacion';
+import RecuperacionContraseña from './pages/recuperacioncontraseña';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/crearpublicacion" element={<CrearPublicacion />} />
         <Route path="/micuenta" element={<MiCuenta />} />
         <Route path="/recuperacion" element={<Recuperacion />} />
+        <Route path="/recuperacion/recuperacion" element={<RecuperacionContraseña />} />
       </Routes>
     </BrowserRouter>
   );
