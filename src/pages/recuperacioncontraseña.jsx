@@ -41,7 +41,7 @@ export default function RecuperacionContraseña() {
     setLoading(true);
     setMensaje('');
     try {
-      const res = await fetch('https://web-autopartes-backend.onrender.com/recuperacioncontraseña', {
+      const res = await fetch('https://web-autopartes-backend.onrender.com/actualizar-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, dni, nuevaPassword }),
