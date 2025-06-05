@@ -40,7 +40,7 @@ export default function Recuperacion() {
     setLoading(true);
     setMensaje('');
     try {
-      const res = await fetch('http://localhost:3000/recuperacion', {
+      const res = await fetch('http://localhost:3001/recuperacion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, dni }),
