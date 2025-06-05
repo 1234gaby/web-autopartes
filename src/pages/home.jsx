@@ -302,7 +302,7 @@ function Home() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="border border-gray-300 dark:border-gray-700 rounded shadow hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 cursor-pointer"
+              className="border border-gray-300 dark:border-gray-700 rounded shadow hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 cursor-pointer flex flex-col h-full"
               onClick={() => navigate(`/publicacion/${pub.id}`)}
               title="Ver detalles"
             >
@@ -319,7 +319,7 @@ function Home() {
                 </div>
               )}
 
-              <div className="p-4 space-y-1">
+              <div className="p-4 flex flex-col flex-1">
                 <h2 className="text-xl font-semibold truncate">{pub.nombre_producto}</h2>
                 <p><strong>Marca:</strong> {pub.marca}</p>
                 <p><strong>Modelo:</strong> {pub.modelo}</p>
@@ -333,18 +333,48 @@ function Home() {
                 </p>
                 <p><strong>Estado:</strong> {pub.estado.charAt(0).toUpperCase() + pub.estado.slice(1)}</p>
                 <p><strong>Envío:</strong> {pub.envio === 'si' ? pub.tipo_envio : 'No'}</p>
+                {/* Compatibilidad: solo muestra hasta 2 y un "+N más" si hay más, con tooltip */}
                 {Array.isArray(pub.compatibilidad) && pub.compatibilidad.length > 0 && (
                   <div className="mt-2">
                     <strong>Compatibilidad:</strong>
                     <ul className="list-disc list-inside text-sm">
-                      {pub.compatibilidad.map((c, i) => (
+                      {pub.compatibilidad.slice(0, 2).map((c, i) => (
                         <li key={i}>
                           {c.marca ? c.marca.charAt(0).toUpperCase() + c.marca.slice(1) : ''} {c.modelo}
                         </li>
                       ))}
+                      {pub.compatibilidad.length > 2 && (
+                        <li
+                          className="text-blue-600 dark:text-blue-300 font-semibold select-none cursor-pointer"
+                          title={pub.compatibilidad.map(c => `${c.marca ? c.marca.charAt(0).toUpperCase() + c.marca.slice(1) : ''} ${c.modelo}`).join(', ')}
+                        >
+                          +{pub.compatibilidad.length - 2} más
+                        </li>
+                      )}
                     </ul>
                   </div>
                 )}
+                {/* Botón Ver publicación atractivo, siempre abajo */}
+                <div className="mt-auto flex justify-end pt-3">
+                  <Button
+                    variant="primary"
+                    onClick={e => {
+                      e.stopPropagation();
+                      navigate(`/publicacion/${pub.id}`);
+                    }}
+                    whileHover={{ scale: 1.08, boxShadow: '0 4px 20px #2563eb55' }}
+                    whileTap={{ scale: 0.97 }}
+                    as={motion.button}
+                    className="bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500 text-white font-bold px-6 py-2 rounded-full shadow-lg transition-all duration-200 border-2 border-blue-500"
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Ver publicación
+                    </span>
+                  </Button>
+                </div>
               </div>
             </motion.div>
           ))
