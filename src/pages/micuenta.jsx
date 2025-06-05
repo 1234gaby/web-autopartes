@@ -75,6 +75,7 @@ const MiCuenta = () => {
             <p><strong>Apellido:</strong> {usuario.apellido}</p>
             <p><strong>Email:</strong> {usuario.email}</p>
             <p><strong>Tipo de cuenta:</strong> {usuario.tipo_cuenta}</p>
+            <p><strong>Teléfono:</strong> {usuario.telefono || '-'}</p>
             {esVendedor && (
               <p><strong>Nombre del local:</strong> {usuario.nombre_local || '-'}</p>
             )}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion'; 
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -29,6 +29,58 @@ const CrearPublicacion = () => {
 
   const [modelosDisponibles, setModelosDisponibles] = useState([]);
   const [compatibilidadTemp, setCompatibilidadTemp] = useState({ marca: '', modelo: '' });
+
+  // Estados para comisión y datos del vendedor
+  const [comision, setComision] = useState(0.3); // 30% base
+  const [comisionDetalle, setComisionDetalle] = useState({
+    base: 0.3,
+    afip: false,
+    ventas: 0,
+    extra: 0,
+  });
+  const [ganancia, setGanancia] = useState(0);
+  const [afipAprobada, setAfipAprobada] = useState(false);
+  const [ventasUltimos30, setVentasUltimos30] = useState(0);
+
+  // Traer datos del usuario y ventas al montar
+  useEffect(() => {
+    if (!userId) return;
+    // Traer usuario
+    axios.get(`https://web-autopartes-backend.onrender.com/usuarios/${userId}`)
+      .then(res => {
+        setAfipAprobada(res.data.constancia_afip_aprobada === true);
+      })
+      .catch(() => setAfipAprobada(false));
+    // Traer ventas últimos 30 días
+    axios.get(`https://web-autopartes-backend.onrender.com/usuarios/${userId}/ventas-ultimos-30`)
+      .then(res => setVentasUltimos30(res.data.ventasUltimos30 || 0))
+      .catch(() => setVentasUltimos30(0));
+  }, [userId]);
+
+  // Calcular comisión y ganancia cada vez que cambia precio, afip o ventas
+  useEffect(() => {
+    let com = 0.3;
+    let extra = 0;
+    if (afipAprobada) com -= 0.05;
+    if (ventasUltimos30 >= 25) extra = 0.10;
+    else if (ventasUltimos30 >= 15) extra = 0.08;
+    else if (ventasUltimos30 >= 5) extra = 0.05;
+    com -= extra;
+    if (com < 0) com = 0;
+    setComision(com);
+    setComisionDetalle({
+      base: 0.3,
+      afip: afipAprobada,
+      ventas: ventasUltimos30,
+      extra,
+    });
+    if (formData.precio) {
+      const precio = parseFloat(formData.precio) || 0;
+      setGanancia(precio - precio * com);
+    } else {
+      setGanancia(0);
+    }
+  }, [formData.precio, afipAprobada, ventasUltimos30]);
 
   const modelosPorMarca = {
     ford: ['Fiesta', 'Focus', 'Mondeo', 'Ranger'],
@@ -194,6 +246,26 @@ const CrearPublicacion = () => {
           step="any"
           className="w-full px-5 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 transition duration-300"
         />
+
+        {/* Desglose de comisión y ganancia */}
+        {formData.precio && (
+          <div className="bg-blue-50 dark:bg-blue-900 rounded p-4 mb-2 text-blue-900 dark:text-blue-100 text-sm">
+            <div>Comisión base: 30%</div>
+            {afipAprobada && <div>- Constancia AFIP/ARCA aprobada: -5%</div>}
+            {ventasUltimos30 >= 5 && (
+              <div>
+                - Ventas últimos 30 días: {ventasUltimos30 >= 25 ? '-10%' : ventasUltimos30 >= 15 ? '-8%' : '-5%'}
+              </div>
+            )}
+            <div>
+              <strong>Comisión total: {(comision * 100).toFixed(1)}%</strong>
+            </div>
+            <div>Comisión en $: ${(parseFloat(formData.precio) * comision).toFixed(2)}</div>
+            <div>
+              <strong>Ganancia neta: ${ganancia.toFixed(2)}</strong>
+            </div>
+          </div>
+        )}
 
         <select
           name="ubicacion"

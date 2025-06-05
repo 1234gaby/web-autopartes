@@ -41,6 +41,46 @@ const EditarPublicacion = () => {
   const [compatibilidad, setCompatibilidad] = useState([]);
   const [compatTemp, setCompatTemp] = useState({ marca: '', modelo: '' });
 
+  // Estados para comisión y datos del vendedor
+  const [comision, setComision] = useState(0.3); // 30% base
+  const [ganancia, setGanancia] = useState(0);
+  const [afipAprobada, setAfipAprobada] = useState(false);
+  const [ventasUltimos30, setVentasUltimos30] = useState(0);
+
+  // Traer datos de usuario y ventas al montar
+  useEffect(() => {
+    if (!publicacion) return;
+    const userId = publicacion.user_id;
+    if (!userId) return;
+    axios.get(`https://web-autopartes-backend.onrender.com/usuarios/${userId}`)
+      .then(res => {
+        setAfipAprobada(res.data.constancia_afip_aprobada === true);
+      })
+      .catch(() => setAfipAprobada(false));
+    axios.get(`https://web-autopartes-backend.onrender.com/usuarios/${userId}/ventas-ultimos-30`)
+      .then(res => setVentasUltimos30(res.data.ventasUltimos30 || 0))
+      .catch(() => setVentasUltimos30(0));
+  }, [publicacion]);
+
+  // Calcular comisión y ganancia cada vez que cambia precio, afip o ventas
+  useEffect(() => {
+    let com = 0.3;
+    let extra = 0;
+    if (afipAprobada) com -= 0.05;
+    if (ventasUltimos30 >= 25) extra = 0.10;
+    else if (ventasUltimos30 >= 15) extra = 0.08;
+    else if (ventasUltimos30 >= 5) extra = 0.05;
+    com -= extra;
+    if (com < 0) com = 0;
+    setComision(com);
+    if (form.precio) {
+      const precio = parseFloat(form.precio) || 0;
+      setGanancia(precio - precio * com);
+    } else {
+      setGanancia(0);
+    }
+  }, [form.precio, afipAprobada, ventasUltimos30]);
+
   useEffect(() => {
     setLoading(true);
     axios.get(`https://web-autopartes-backend.onrender.com/publicaciones/${id}`)
@@ -212,6 +252,27 @@ const EditarPublicacion = () => {
             className="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           />
         </div>
+
+        {/* Desglose de comisión y ganancia */}
+        {form.precio && (
+          <div className="bg-blue-50 dark:bg-blue-900 rounded p-4 mb-2 text-blue-900 dark:text-blue-100 text-sm">
+            <div>Comisión base: 30%</div>
+            {afipAprobada && <div>- Constancia AFIP/ARCA aprobada: -5%</div>}
+            {ventasUltimos30 >= 5 && (
+              <div>
+                - Ventas últimos 30 días: {ventasUltimos30 >= 25 ? '-10%' : ventasUltimos30 >= 15 ? '-8%' : '-5%'}
+              </div>
+            )}
+            <div>
+              <strong>Comisión total: {(comision * 100).toFixed(1)}%</strong>
+            </div>
+            <div>Comisión en $: {(parseFloat(form.precio) * comision).toFixed(2)}</div>
+            <div>
+              <strong>Ganancia neta: ${ganancia.toFixed(2)}</strong>
+            </div>
+          </div>
+        )}
+
         <div>
           <Label className="text-gray-900 dark:text-gray-100">Ubicación</Label>
           <select
