@@ -10,9 +10,10 @@ import { LoadingOverlay } from '../components/ui/LoadingOverlay';
 
 const MotionButton = motion.create(Button);
 
-function Login() {
+export default function Recuperacion() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [dni, setDni] = useState('');
+  const [mensaje, setMensaje] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -37,32 +38,21 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+    setMensaje('');
     try {
-      const response = await fetch('https://web-autopartes-backend.onrender.com/login', {
+      const res = await fetch('http://localhost:3000/recuperacion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, dni }),
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('user_id', data.user_id);
-        localStorage.setItem('perfil', data.tipoCuenta);
-        navigate('/home');
-      } else {
-        alert('Login incorrecto');
-      }
+      const data = await res.json();
+      setMensaje(data.message || data.error);
     } catch (error) {
-      console.error('Error al conectar con el servidor:', error);
-      alert('Error de conexión al servidor');
+      setMensaje('Error de conexión al servidor');
     } finally {
       setLoading(false);
     }
   };
-
-  const continuarComoInvitado = () => navigate('/home');
-  const irARegistro = () => navigate('/register');
 
   return (
     <motion.div
@@ -91,10 +81,9 @@ function Login() {
         <Card className="p-6 bg-white dark:bg-gray-800">
           <CardHeader>
             <CardTitle className="text-3xl text-center text-gray-900 dark:text-gray-100">
-              Iniciar sesión
+              Recuperar contraseña
             </CardTitle>
           </CardHeader>
-
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -102,36 +91,25 @@ function Login() {
                 <Input
                   id="email"
                   type="email"
+                  required
+                  placeholder="Tu email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoComplete="username"
                   className="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 />
               </div>
               <div>
-                <Label htmlFor="password" className="text-gray-900 dark:text-gray-100">Contraseña</Label>
+                <Label htmlFor="dni" className="text-gray-900 dark:text-gray-100">DNI</Label>
                 <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  id="dni"
+                  type="text"
                   required
-                  autoComplete="current-password"
+                  placeholder="Tu DNI"
+                  value={dni}
+                  onChange={(e) => setDni(e.target.value)}
                   className="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 />
               </div>
-
-              <div className="text-right">
-                <button
-                  type="button"
-                  onClick={() => navigate('/recuperacion')}
-                  className="text-sm text-blue-600 dark:text-blue-400 hover:underline focus:outline-none transition-colors"
-                >
-                  ¿Olvidaste tu contraseña?
-                </button>
-              </div>
-
               <MotionButton
                 type="submit"
                 disabled={loading}
@@ -140,36 +118,26 @@ function Login() {
                 whileTap={{ scale: 0.95 }}
               >
                 {loading && <Loader2 className="animate-spin mr-2 h-4 w-4" />}
-                Iniciar sesión
+                Enviar enlace de recuperación
+              </MotionButton>
+              {mensaje && (
+                <div className="mt-2 text-center text-sm text-blue-700 dark:text-blue-300">
+                  {mensaje}
+                </div>
+              )}
+              <MotionButton
+                type="button"
+                onClick={() => navigate('/')}
+                className="w-full mt-2 bg-gray-300 text-gray-800 hover:bg-gray-400 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600 transition-transform duration-150"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Volver al inicio
               </MotionButton>
             </form>
-
-            <div className="mt-6 space-y-3">
-              <MotionButton
-                onClick={irARegistro}
-                className="w-full bg-gray-300 text-gray-800 hover:bg-gray-400 transition-transform duration-150"
-                type="button"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Registrarse
-              </MotionButton>
-
-              <MotionButton
-                onClick={continuarComoInvitado}
-                className="w-full bg-green-600 hover:bg-green-700 text-white transition-transform duration-150"
-                type="button"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Continuar como invitado
-              </MotionButton>
-            </div>
           </CardContent>
         </Card>
       </motion.div>
     </motion.div>
   );
 }
-
-export default Login;
