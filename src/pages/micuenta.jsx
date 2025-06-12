@@ -145,16 +145,18 @@ const MiCuenta = () => {
               Editar perfil
             </MotionButton>
 
-            <MotionButton
-              onClick={() => navigate('/mis-compras')}
-              className="px-5 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition"
-              type="button"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Mis compras
-            </MotionButton>
-
+            {/* Mostrar "Mis compras" solo si NO es vendedor */}
+            {!esVendedor && (
+              <MotionButton
+                onClick={() => navigate('/mis-compras')}
+                className="px-5 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition"
+                type="button"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Mis compras
+              </MotionButton>
+            )}
             {esVendedor && (
               <MotionButton
                 onClick={() => navigate('/mis-publicaciones')}

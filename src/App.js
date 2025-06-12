@@ -12,6 +12,7 @@ import MisPublicaciones from './pages/mispublicaciones';
 import EditarPublicacion from './pages/editarpublicacion';
 import VerPublicacion from './pages/verpublicacion';
 import Compra from './pages/compra';
+import MisCompras from './pages/miscompras';
 import { DarkModeProvider } from './context/DarkModeContext';
 import { DarkModeToggle } from './components/DarkModeToggle';
 
@@ -34,6 +35,7 @@ function App() {
           <Route path="/recuperacion/recuperacion" element={<RecuperacionContraseña />} />
           <Route path="/editar-perfil" element={<EditarPerfil />} />
           <Route path="/mis-publicaciones" element={<MisPublicaciones />} />
+          <Route path="/mis-compras" element={<MisCompras />} />
           <Route path="/editar-publicacion/:id" element={<EditarPublicacion />} />
           <Route path="/publicacion/:id" element={<VerPublicacion />} />
           <Route path="/compra/:id" element={<Compra />} />
