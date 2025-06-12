@@ -8,6 +8,8 @@ const MisCompras = () => {
   const [loading, setLoading] = useState(true);
   const [comprobanteFiles, setComprobanteFiles] = useState({});
   const [subiendo, setSubiendo] = useState({});
+  const [vendedores, setVendedores] = useState({});
+  const [aviso, setAviso] = useState('');
   const navigate = useNavigate();
   const userId = localStorage.getItem('user_id');
 
@@ -19,12 +21,39 @@ const MisCompras = () => {
     setLoading(true);
     axios
       .get(`https://web-autopartes-backend.onrender.com/usuarios/${userId}/compras`)
-      .then(res => setCompras(res.data || []))
+      .then(async res => {
+        const comprasData = res.data || [];
+        setCompras(comprasData);
+
+        // Obtener nombre_local de cada vendedor (como en verpublicacion.jsx)
+        const vendedorIds = [
+          ...new Set(comprasData.map(c => c.vendedor_id).filter(Boolean))
+        ];
+        const vendedoresObj = {};
+        await Promise.all(
+          vendedorIds.map(async (id) => {
+            try {
+              const resUser = await axios.get(`https://web-autopartes-backend.onrender.com/usuarios/${id}`);
+              vendedoresObj[id] = resUser.data?.nombre_local || '-';
+            } catch {
+              vendedoresObj[id] = '-';
+            }
+          })
+        );
+        setVendedores(vendedoresObj);
+      })
       .catch(() => setCompras([]))
       .finally(() => setLoading(false));
   }, [userId, navigate]);
 
   const handleFileChange = (ventaId, file) => {
+    // Solo permitir imágenes
+    if (file && !file.type.startsWith('image/')) {
+      setAviso('Solo se permite subir imágenes o capturas de pantalla (no PDF).');
+      setComprobanteFiles(prev => ({ ...prev, [ventaId]: undefined }));
+      return;
+    }
+    setAviso('');
     setComprobanteFiles(prev => ({ ...prev, [ventaId]: file }));
   };
 
@@ -72,6 +101,19 @@ const MisCompras = () => {
       >
         Volver a mi cuenta
       </motion.button>
+
+      {/* Aviso sobre el formato del comprobante */}
+      <div className="mb-4 w-full max-w-3xl">
+        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100 px-4 py-3 rounded shadow text-sm">
+          Solo se permite subir comprobantes en formato <b>imagen</b> (JPG, PNG, captura de pantalla). <b>No se admite PDF</b>.
+        </div>
+        {aviso && (
+          <div className="mt-2 bg-red-100 border-l-4 border-red-500 text-red-800 dark:bg-red-900 dark:text-red-100 px-4 py-2 rounded shadow text-sm">
+            {aviso}
+          </div>
+        )}
+      </div>
+
       {loading ? (
         <motion.div
           initial={{ opacity: 0 }}
@@ -96,7 +138,7 @@ const MisCompras = () => {
           className="w-full max-w-5xl"
         >
           <div className="rounded-lg shadow-xl overflow-x-auto bg-white dark:bg-gray-800">
-            <table className="w-full min-w-[1100px]">
+            <table className="w-full min-w-[1300px]">
               <thead>
                 <tr className="bg-blue-100 dark:bg-blue-900">
                   <th className="px-4 py-2 text-left font-semibold text-blue-900 dark:text-blue-100">Producto</th>
@@ -121,13 +163,15 @@ const MisCompras = () => {
                       transition={{ delay: 0.15 + idx * 0.05 }}
                       className="border-t border-gray-200 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-gray-700 transition"
                     >
-                      <td className="px-4 py-2">{compra.nombre_producto || compra.producto || 'Producto'}</td>
-                      <td className="px-4 py-2">{compra.cantidad}</td>
-                      <td className="px-4 py-2">${Number(compra.monto).toFixed(2)}</td>
-                      <td className="px-4 py-2">{fechaObj ? fechaObj.toLocaleDateString() : '-'}</td>
-                      <td className="px-4 py-2">{fechaObj ? fechaObj.toLocaleTimeString() : '-'}</td>
-                      <td className="px-4 py-2">{compra.nombre_local || '-'}</td>
-                      <td className="px-4 py-2">{compra.tipo_envio || '-'}</td>
+                      <td className="px-4 py-2 text-blue-900 dark:text-blue-100">{compra.nombre_producto || compra.producto || 'Producto'}</td>
+                      <td className="px-4 py-2 text-blue-900 dark:text-blue-100">{compra.cantidad}</td>
+                      <td className="px-4 py-2 text-blue-900 dark:text-blue-100">${Number(compra.monto).toFixed(2)}</td>
+                      <td className="px-4 py-2 text-blue-900 dark:text-blue-100">{fechaObj ? fechaObj.toLocaleDateString() : '-'}</td>
+                      <td className="px-4 py-2 text-blue-900 dark:text-blue-100">{fechaObj ? fechaObj.toLocaleTimeString() : '-'}</td>
+                      <td className="px-4 py-2 text-blue-900 dark:text-blue-100">
+                        {vendedores[compra.vendedor_id] || '-'}
+                      </td>
+                      <td className="px-4 py-2 text-blue-900 dark:text-blue-100">{compra.tipo_envio || '-'}</td>
                       <td className="px-4 py-2">
                         <motion.button
                           whileHover={{ scale: 1.07 }}
@@ -152,7 +196,7 @@ const MisCompras = () => {
                           <div className="flex items-center gap-2">
                             <input
                               type="file"
-                              accept="image/*,application/pdf"
+                              accept="image/*"
                               onChange={e => handleFileChange(compra.id, e.target.files[0])}
                             />
                             <motion.button
