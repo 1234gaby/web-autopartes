@@ -135,10 +135,10 @@ const MisCompras = () => {
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.1 }}
-          className="w-full max-w-5xl"
+          className="w-full max-w-[98vw]" // Ahora el cuadro ocupa casi todo el ancho de la ventana
         >
           <div className="rounded-lg shadow-xl overflow-x-auto bg-white dark:bg-gray-800">
-            <table className="w-full min-w-[1300px]">
+            <table className="w-full min-w-[1500px]"> {/* Más ancho para la tabla */}
               <thead>
                 <tr className="bg-blue-100 dark:bg-blue-900">
                   <th className="px-4 py-2 text-left font-semibold text-blue-900 dark:text-blue-100">Producto</th>
