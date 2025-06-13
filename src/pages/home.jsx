@@ -7,6 +7,7 @@ import { Button } from '../components/ui/button';
 import { Label } from '../components/ui/label';
 import { Select } from '../components/ui/select';
 import { LoadingOverlay } from '../components/ui/LoadingOverlay';
+import DeLoreanImg from './DELOREAN.png';
 
 const modelosPorMarca = {
   ford: ['Fiesta', 'Focus', 'Mondeo', 'Ranger'],
@@ -20,9 +21,7 @@ const localidadesBrown = [
   'Longchamps', 'Malvinas Argentinas', 'Ministro Rivadavia', 'Rafael Calzada', 'San José', 'Solano'
 ];
 
-// Utilidad para mostrar el envío como en crearpublicacion.jsx
 function mostrarEnvio(pub) {
-  // Si el campo es booleano o string
   if (pub.envio === true || pub.envio === 'true') {
     return pub.tipo_envio
       ? (pub.tipo_envio === 'uber_moto'
@@ -37,7 +36,6 @@ function mostrarEnvio(pub) {
   if (pub.envio === false || pub.envio === 'false') {
     return 'No';
   }
-  // Si el campo es string 'si'/'no'
   if (pub.envio === 'si') {
     return pub.tipo_envio
       ? (pub.tipo_envio === 'uber_moto'
@@ -98,16 +96,13 @@ function Home() {
     }
   };
 
-  // Buscador avanzado: nombre, ubicación, modelo, modelos compatibles
   const filtrarPublicaciones = () => {
     return publicaciones
       .filter(pub => {
-        // Filtros select
         const filtroMarca = !filtros.marca || pub.marca === filtros.marca;
         const filtroModelo = !filtros.modelo || pub.modelo === filtros.modelo;
         const filtroUbicacion = !filtros.ubicacion || pub.ubicacion === filtros.ubicacion;
 
-        // Filtro de envío: compara como booleano
         let filtroEnvio = true;
         if (filtros.envio === 'si') {
           filtroEnvio = pub.envio === true || pub.envio === 'true' || pub.envio === 'si';
@@ -117,13 +112,11 @@ function Home() {
 
         const filtroEstado = !filtros.estado || pub.estado === filtros.estado;
 
-        // Buscador: nombre, ubicación, modelo, modelos compatibles
         const texto = busqueda.trim().toLowerCase();
         if (!texto) {
           return filtroMarca && filtroModelo && filtroUbicacion && filtroEnvio && filtroEstado;
         }
 
-        // Modelos compatibles: array de objetos {marca, modelo}
         let compatibles = '';
         if (Array.isArray(pub.compatibilidad)) {
           compatibles = pub.compatibilidad
@@ -153,82 +146,112 @@ function Home() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
       <LoadingOverlay loading={loading} />
 
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
-        <h1 className="text-3xl font-extrabold">Publicaciones</h1>
-        <div className="flex flex-wrap gap-3">
-          {userId ? (
-            <>
-              {!esMecanico && (
+      {/* Banner con texto a la izquierda, imagen al centro y botones a la derecha */}
+      <section className="flex flex-col md:flex-row items-center justify-between gap-2 px-4 md:px-10 py-6 bg-white/90 dark:bg-gray-900/90 shadow rounded-b-2xl mb-6">
+        {/* Texto a la izquierda */}
+        <div className="flex-1 flex flex-col items-start md:items-start md:justify-center min-w-[220px]">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-blue-900 dark:text-blue-200 mb-1 drop-shadow">
+            DeLorean Parts
+          </h1>
+          <p className="text-sm md:text-base text-gray-700 dark:text-gray-200">
+            La plataforma más rápida y segura para comprar y vender autopartes en Argentina.
+          </p>
+        </div>
+        {/* Imagen al centro */}
+        <div className="flex-1 flex justify-center items-center my-3 md:my-0">
+          <img
+            src={DeLoreanImg}
+            alt="DeLorean"
+            className="object-contain"
+            style={{
+              background: 'none',
+              border: 'none',
+              boxShadow: 'none',
+              display: 'block',
+              mixBlendMode: 'multiply',
+              width: '400px',
+              height: '188px',
+              maxWidth: '90vw'
+            }}
+            loading="lazy"
+          />
+        </div>
+        {/* Botones a la derecha */}
+        <div className="flex-1 flex flex-col md:items-end items-center gap-2 min-w-[220px]">
+          <div className="flex gap-3 flex-wrap justify-center md:justify-end">
+            {userId ? (
+              <>
+                {!esMecanico && (
+                  <Button
+                    variant="primary"
+                    onClick={() => navigate('/crearpublicacion')}
+                    className="min-w-[110px] bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500 text-white shadow"
+                    as={motion.button}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Crear Publicación
+                  </Button>
+                )}
                 <Button
-                  variant="primary"
-                  onClick={() => navigate('/crearpublicacion')}
-                  className="min-w-[140px]"
+                  variant="secondary"
+                  onClick={() => navigate('/micuenta')}
+                  className="min-w-[90px] bg-white dark:bg-gray-700 border border-blue-400 text-blue-700 dark:text-blue-200 shadow"
+                  as={motion.button}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  as={motion.button}
                 >
-                  Crear Publicación
+                  Mi Cuenta
                 </Button>
-              )}
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    localStorage.removeItem('user_id');
+                    localStorage.removeItem('perfil');
+                    navigate('/');
+                  }}
+                  className="min-w-[90px] bg-gradient-to-r from-red-500 to-red-700 text-white shadow"
+                  as={motion.button}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Cerrar sesión
+                </Button>
+              </>
+            ) : (
               <Button
-                variant="secondary"
-                onClick={() => navigate('/micuenta')}
-                className="min-w-[120px]"
+                variant="primary"
+                onClick={() => navigate('/login')}
+                className="min-w-[110px] bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500 text-white shadow"
+                as={motion.button}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                as={motion.button}
               >
-                Mi Cuenta
+                Iniciar sesión
               </Button>
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  localStorage.removeItem('user_id');
-                  localStorage.removeItem('perfil');
-                  navigate('/');
-                }}
-                className="min-w-[120px]"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                as={motion.button}
-              >
-                Cerrar sesión
-              </Button>
-            </>
-          ) : (
-            <Button
-              variant="primary"
-              onClick={() => navigate('/')}
-              className="min-w-[140px]"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              as={motion.button}
-            >
-              Iniciar sesión
-            </Button>
-          )}
+            )}
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* Buscador alineado al área de trabajo */}
-      <div className="mb-6 flex justify-center">
-        <div className="w-full">
+      {/* Buscador */}
+      <div className="mb-6 flex justify-center px-4">
+        <div className="w-full max-w-2xl">
           <input
             type="text"
             placeholder="Buscar por producto, ubicación, modelo o compatibilidad..."
             value={busqueda}
             onChange={e => setBusqueda(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 transition duration-300"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 transition duration-300 shadow"
           />
         </div>
       </div>
 
       {/* Filtros */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 mb-10">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 mb-10 px-4 max-w-7xl mx-auto">
         <div>
           <Label htmlFor="marca">Marca</Label>
           <Select
@@ -330,7 +353,7 @@ function Home() {
       {/* Lista de publicaciones */}
       <motion.div
         layout
-        className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3"
+        className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 max-w-7xl mx-auto px-4 pb-16"
       >
         {filtrarPublicaciones().length === 0 && !loading ? (
           <p className="col-span-full text-center text-gray-600 dark:text-gray-400">
@@ -345,7 +368,7 @@ function Home() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="border border-gray-300 dark:border-gray-700 rounded shadow hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 cursor-pointer flex flex-col h-full"
+              className="border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow bg-white dark:bg-gray-800 cursor-pointer flex flex-col h-full overflow-hidden"
               onClick={() => navigate(`/publicacion/${pub.id}`)}
               title="Ver detalles"
             >
@@ -353,30 +376,29 @@ function Home() {
                 <img
                   src={pub.fotos[0]}
                   alt={pub.nombre_producto}
-                  className="w-full h-48 object-cover rounded-t"
+                  className="w-full h-48 object-cover rounded-t-2xl"
                   loading="lazy"
                 />
               ) : (
-                <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center rounded-t text-gray-600 dark:text-gray-400 select-none">
+                <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center rounded-t-2xl text-gray-600 dark:text-gray-400 select-none">
                   Sin imagen
                 </div>
               )}
 
-              <div className="p-4 flex flex-col flex-1">
-                <h2 className="text-xl font-semibold truncate">{pub.nombre_producto}</h2>
-                <p><strong>Marca:</strong> {pub.marca}</p>
-                <p><strong>Modelo:</strong> {pub.modelo}</p>
-                <p>
+              <div className="p-5 flex flex-col flex-1">
+                <h2 className="text-xl font-bold truncate mb-1">{pub.nombre_producto}</h2>
+                <p className="mb-1"><strong>Marca:</strong> {pub.marca}</p>
+                <p className="mb-1"><strong>Modelo:</strong> {pub.modelo}</p>
+                <p className="mb-1">
                   <strong>Precio:</strong>{' '}
                   {userId ? `$${pub.precio.toLocaleString('es-AR')}` : 'Iniciar sesión para ver'}
                 </p>
-                <p>
+                <p className="mb-1">
                   <strong>Ubicación:</strong>{' '}
                   {userId ? pub.ubicacion : 'Iniciar sesión para ver'}
                 </p>
-                <p><strong>Estado:</strong> {pub.estado.charAt(0).toUpperCase() + pub.estado.slice(1)}</p>
-                <p><strong>Envío:</strong> {mostrarEnvio(pub)}</p>
-                {/* Compatibilidad: solo muestra hasta 2 y un "+N más" si hay más, con tooltip */}
+                <p className="mb-1"><strong>Estado:</strong> {pub.estado.charAt(0).toUpperCase() + pub.estado.slice(1)}</p>
+                <p className="mb-1"><strong>Envío:</strong> {mostrarEnvio(pub)}</p>
                 {Array.isArray(pub.compatibilidad) && pub.compatibilidad.length > 0 && (
                   <div className="mt-2">
                     <strong>Compatibilidad:</strong>
@@ -397,7 +419,6 @@ function Home() {
                     </ul>
                   </div>
                 )}
-                {/* Botón Ver publicación atractivo, siempre abajo */}
                 <div className="mt-auto flex justify-end pt-3">
                   <Button
                     variant="primary"
