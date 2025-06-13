@@ -15,6 +15,13 @@ const Compra = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Campos de envío
+  const [localidadEnvio, setLocalidadEnvio] = useState('');
+  const [direccionEnvio, setDireccionEnvio] = useState('');
+  const [alturaEnvio, setAlturaEnvio] = useState('');
+  const [entrecallesEnvio, setEntrecallesEnvio] = useState('');
+  const [erroresEnvio, setErroresEnvio] = useState('');
+
   useEffect(() => {
     axios.get(`https://web-autopartes-backend.onrender.com/publicaciones/${id}`)
       .then(res => setPublicacion(res.data));
@@ -72,6 +79,20 @@ const Compra = () => {
   if (!publicacion || !comprador || !desglose) return (
     <div className="text-center py-10 text-gray-800 dark:text-gray-100">Cargando...</div>
   );
+
+  // Detectar si requiere envío
+  const requiereEnvio = publicacion.envio === 'si' || publicacion.envio === 'Sí' || publicacion.envio === 'SI';
+
+  // Validar campos de envío
+  const validarCamposEnvio = () => {
+    if (!requiereEnvio) return true;
+    if (!localidadEnvio || !direccionEnvio || !alturaEnvio || !entrecallesEnvio) {
+      setErroresEnvio('Debes completar todos los datos de envío.');
+      return false;
+    }
+    setErroresEnvio('');
+    return true;
+  };
 
   return (
     <motion.div
@@ -185,6 +206,51 @@ const Compra = () => {
             )}
           </strong>
         </div>
+
+        {/* Campos de envío si corresponde */}
+        {requiereEnvio && (
+          <div className="mb-4 bg-blue-50 dark:bg-blue-900 p-4 rounded shadow">
+            <h3 className="font-bold text-blue-800 dark:text-blue-200 mb-2">Datos para el envío</h3>
+            <div className="flex flex-col gap-2">
+              <input
+                type="text"
+                placeholder="Localidad"
+                value={localidadEnvio}
+                onChange={e => setLocalidadEnvio(e.target.value)}
+                className="px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                required
+              />
+              <input
+                type="text"
+                placeholder="Dirección"
+                value={direccionEnvio}
+                onChange={e => setDireccionEnvio(e.target.value)}
+                className="px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                required
+              />
+              <input
+                type="text"
+                placeholder="Altura"
+                value={alturaEnvio}
+                onChange={e => setAlturaEnvio(e.target.value)}
+                className="px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                required
+              />
+              <input
+                type="text"
+                placeholder="Entre calles"
+                value={entrecallesEnvio}
+                onChange={e => setEntrecallesEnvio(e.target.value)}
+                className="px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                required
+              />
+            </div>
+            {erroresEnvio && (
+              <div className="mt-2 text-red-600 dark:text-red-400">{erroresEnvio}</div>
+            )}
+          </div>
+        )}
+
         <div className="flex flex-col sm:flex-row justify-center gap-4 mt-6">
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -192,6 +258,9 @@ const Compra = () => {
             className="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-800 dark:to-blue-600 text-white rounded font-bold shadow-lg transition-all duration-200"
             disabled={loading}
             onClick={async () => {
+              // Validar campos de envío si corresponde
+              if (requiereEnvio && !validarCamposEnvio()) return;
+
               setLoading(true);
               try {
                 await axios.post('https://web-autopartes-backend.onrender.com/ventas', {
@@ -199,7 +268,11 @@ const Compra = () => {
                   comprador_id: comprador.id,
                   publicacion_id: publicacion.id,
                   cantidad,
-                  monto: desglose.total
+                  monto: desglose.total,
+                  localidad_envio: requiereEnvio ? localidadEnvio : null,
+                  direccion_envio: requiereEnvio ? direccionEnvio : null,
+                  altura_envio: requiereEnvio ? alturaEnvio : null,
+                  entrecalles_envio: requiereEnvio ? entrecallesEnvio : null
                 });
                 const nuevoCashback = (Number(desglose.cashbackDisponible) - Number(desglose.cashbackAplicado)) + Number(desglose.cupon);
                 await axios.put(`https://web-autopartes-backend.onrender.com/usuarios/${userId}/cashback`, {

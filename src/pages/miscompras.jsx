@@ -78,6 +78,17 @@ const MisCompras = () => {
     setSubiendo(prev => ({ ...prev, [ventaId]: false }));
   };
 
+  // Función para mostrar correctamente el envío
+  const mostrarEnvio = (compra) => {
+    if (compra.envio === true || compra.envio === 'true') {
+      return compra.tipo_envio ? compra.tipo_envio : 'Sí';
+    }
+    if (compra.envio === false || compra.envio === 'false') {
+      return 'No';
+    }
+    return '-';
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -135,10 +146,10 @@ const MisCompras = () => {
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.1 }}
-          className="w-full max-w-[98vw]" // Ahora el cuadro ocupa casi todo el ancho de la ventana
+          className="w-full max-w-[98vw]"
         >
           <div className="rounded-lg shadow-xl overflow-x-auto bg-white dark:bg-gray-800">
-            <table className="w-full min-w-[1500px]"> {/* Más ancho para la tabla */}
+            <table className="w-full min-w-[1200px]">
               <thead>
                 <tr className="bg-blue-100 dark:bg-blue-900">
                   <th className="px-4 py-2 text-left font-semibold text-blue-900 dark:text-blue-100">Producto</th>
@@ -171,7 +182,9 @@ const MisCompras = () => {
                       <td className="px-4 py-2 text-blue-900 dark:text-blue-100">
                         {vendedores[compra.vendedor_id] || '-'}
                       </td>
-                      <td className="px-4 py-2 text-blue-900 dark:text-blue-100">{compra.tipo_envio || '-'}</td>
+                      <td className="px-4 py-2 text-blue-900 dark:text-blue-100">
+                        {mostrarEnvio(compra)}
+                      </td>
                       <td className="px-4 py-2">
                         <motion.button
                           whileHover={{ scale: 1.07 }}

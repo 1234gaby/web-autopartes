@@ -47,7 +47,10 @@ const EditarPublicacion = () => {
   const [afipAprobada, setAfipAprobada] = useState(false);
   const [ventasUltimos30, setVentasUltimos30] = useState(0);
 
-  // Traer datos de usuario y ventas al montar
+  // Estados para envío (SIEMPRE string)
+  const [envio, setEnvio] = useState("false");
+  const [tipoEnvio, setTipoEnvio] = useState('');
+
   useEffect(() => {
     if (!publicacion) return;
     const userId = publicacion.user_id;
@@ -62,7 +65,6 @@ const EditarPublicacion = () => {
       .catch(() => setVentasUltimos30(0));
   }, [publicacion]);
 
-  // Calcular comisión y ganancia cada vez que cambia precio, afip o ventas
   useEffect(() => {
     let com = 0.3;
     let extra = 0;
@@ -100,6 +102,9 @@ const EditarPublicacion = () => {
         setImagenes(Array.isArray(res.data.fotos) ? res.data.fotos : []);
         setModelosDisponibles(modelosPorMarca[res.data.marca] || []);
         setCompatibilidad(Array.isArray(res.data.compatibilidad) ? res.data.compatibilidad : []);
+        // CORRECCIÓN: Siempre string "true" o "false"
+        setEnvio(res.data.envio === true ? "true" : "false");
+        setTipoEnvio(res.data.tipo_envio || '');
       })
       .catch(() => alert('Error al cargar la publicación'))
       .finally(() => setLoading(false));
@@ -115,7 +120,14 @@ const EditarPublicacion = () => {
     }
   };
 
-  // Compatibilidad
+  const handleEnvioChange = e => {
+    setEnvio(e.target.value);
+    if (e.target.value !== 'true') setTipoEnvio('');
+  };
+  const handleTipoEnvioChange = e => {
+    setTipoEnvio(e.target.value);
+  };
+
   const handleCompatMarca = e => {
     setCompatTemp({ marca: e.target.value, modelo: '' });
   };
@@ -153,16 +165,18 @@ const EditarPublicacion = () => {
     e.preventDefault();
     setLoading(true);
 
-    const formData = new FormData();
-    Object.entries(form).forEach(([k, v]) => formData.append(k, v));
-    formData.append('compatibilidad', JSON.stringify(compatibilidad));
-    nuevasImagenes.forEach(img => formData.append('nuevasFotos', img));
-    formData.append('imagenesAEliminar', JSON.stringify(imagenesAEliminar));
+    const data = new FormData();
+    Object.entries(form).forEach(([k, v]) => data.append(k, v));
+    data.append('envio', envio);
+    data.append('tipo_envio', tipoEnvio);
+    data.append('compatibilidad', JSON.stringify(compatibilidad));
+    nuevasImagenes.forEach(img => data.append('nuevasFotos', img));
+    data.append('imagenesAEliminar', JSON.stringify(imagenesAEliminar));
 
     try {
       await axios.put(
         `https://web-autopartes-backend.onrender.com/publicaciones/${id}`,
-        formData,
+        data,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
       alert('Publicación actualizada');
@@ -253,7 +267,6 @@ const EditarPublicacion = () => {
           />
         </div>
 
-        {/* Desglose de comisión y ganancia */}
         {form.precio && (
           <div className="bg-blue-50 dark:bg-blue-900 rounded p-4 mb-2 text-blue-900 dark:text-blue-100 text-sm">
             <div>Comisión base: 30%</div>
@@ -288,6 +301,41 @@ const EditarPublicacion = () => {
             ))}
           </select>
         </div>
+
+        <div>
+          <Label className="text-gray-900 dark:text-gray-100 font-semibold block mb-1">
+            ¿Envío?
+          </Label>
+          <select
+            name="envio"
+            value={envio}
+            onChange={handleEnvioChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+          >
+            <option value="false">No</option>
+            <option value="true">Si</option>
+          </select>
+        </div>
+        {envio === 'true' && (
+          <div>
+            <Label className="text-gray-900 dark:text-gray-100 font-semibold block mb-1">
+              Tipo de envío
+            </Label>
+            <select
+              name="tipo_envio"
+              value={tipoEnvio}
+              onChange={handleTipoEnvioChange}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            >
+              <option value="">Seleccionar tipo de envío</option>
+              <option value="uber_moto">Uber Moto</option>
+              <option value="uber_auto">Uber Auto</option>
+              <option value="flete">Flete</option>
+            </select>
+          </div>
+        )}
+
         <div>
           <Label className="text-gray-900 dark:text-gray-100">Categoría</Label>
           <select
@@ -337,7 +385,6 @@ const EditarPublicacion = () => {
           />
         </div>
 
-        {/* Compatibilidad */}
         <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-4">
           <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">Compatibilidad</h3>
           <div className="flex gap-4 mb-3 flex-wrap">
@@ -395,7 +442,6 @@ const EditarPublicacion = () => {
           )}
         </div>
 
-        {/* Imágenes actuales */}
         <div>
           <Label className="text-gray-900 dark:text-gray-100">Imágenes actuales</Label>
           <div className="flex flex-wrap gap-2 mt-2">
@@ -419,7 +465,6 @@ const EditarPublicacion = () => {
           </div>
         </div>
 
-        {/* Nuevas imágenes */}
         <div>
           <Label className="text-gray-900 dark:text-gray-100">Agregar nuevas imágenes</Label>
           <input

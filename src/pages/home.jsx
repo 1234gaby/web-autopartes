@@ -20,6 +20,41 @@ const localidadesBrown = [
   'Longchamps', 'Malvinas Argentinas', 'Ministro Rivadavia', 'Rafael Calzada', 'San José', 'Solano'
 ];
 
+// Utilidad para mostrar el envío como en crearpublicacion.jsx
+function mostrarEnvio(pub) {
+  // Si el campo es booleano o string
+  if (pub.envio === true || pub.envio === 'true') {
+    return pub.tipo_envio
+      ? (pub.tipo_envio === 'uber_moto'
+          ? 'Uber Moto'
+          : pub.tipo_envio === 'uber_auto'
+          ? 'Uber Auto'
+          : pub.tipo_envio === 'flete'
+          ? 'Flete'
+          : pub.tipo_envio)
+      : 'Sí';
+  }
+  if (pub.envio === false || pub.envio === 'false') {
+    return 'No';
+  }
+  // Si el campo es string 'si'/'no'
+  if (pub.envio === 'si') {
+    return pub.tipo_envio
+      ? (pub.tipo_envio === 'uber_moto'
+          ? 'Uber Moto'
+          : pub.tipo_envio === 'uber_auto'
+          ? 'Uber Auto'
+          : pub.tipo_envio === 'flete'
+          ? 'Flete'
+          : pub.tipo_envio)
+      : 'Sí';
+  }
+  if (pub.envio === 'no') {
+    return 'No';
+  }
+  return '-';
+}
+
 function Home() {
   const navigate = useNavigate();
   const [publicaciones, setPublicaciones] = useState([]);
@@ -71,7 +106,15 @@ function Home() {
         const filtroMarca = !filtros.marca || pub.marca === filtros.marca;
         const filtroModelo = !filtros.modelo || pub.modelo === filtros.modelo;
         const filtroUbicacion = !filtros.ubicacion || pub.ubicacion === filtros.ubicacion;
-        const filtroEnvio = !filtros.envio || pub.envio === filtros.envio;
+
+        // Filtro de envío: compara como booleano
+        let filtroEnvio = true;
+        if (filtros.envio === 'si') {
+          filtroEnvio = pub.envio === true || pub.envio === 'true' || pub.envio === 'si';
+        } else if (filtros.envio === 'no') {
+          filtroEnvio = pub.envio === false || pub.envio === 'false' || pub.envio === 'no';
+        }
+
         const filtroEstado = !filtros.estado || pub.estado === filtros.estado;
 
         // Buscador: nombre, ubicación, modelo, modelos compatibles
@@ -332,7 +375,7 @@ function Home() {
                   {userId ? pub.ubicacion : 'Iniciar sesión para ver'}
                 </p>
                 <p><strong>Estado:</strong> {pub.estado.charAt(0).toUpperCase() + pub.estado.slice(1)}</p>
-                <p><strong>Envío:</strong> {pub.envio === 'si' ? pub.tipo_envio : 'No'}</p>
+                <p><strong>Envío:</strong> {mostrarEnvio(pub)}</p>
                 {/* Compatibilidad: solo muestra hasta 2 y un "+N más" si hay más, con tooltip */}
                 {Array.isArray(pub.compatibilidad) && pub.compatibilidad.length > 0 && (
                   <div className="mt-2">

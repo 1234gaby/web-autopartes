@@ -16,7 +16,7 @@ const CrearPublicacion = () => {
     modelo: '',
     precio: '',
     ubicacion: '',
-    envio: 'no',
+    envio: false, // booleano
     tipo_envio: '',
     categoria: '',
     estado: 'nuevo',
@@ -112,6 +112,8 @@ const CrearPublicacion = () => {
       }
       const fileArray = Array.from(files);
       setFormData({ ...formData, fotos: fileArray });
+    } else if (name === 'envio') {
+      setFormData({ ...formData, envio: value === 'true' }); // Convierte a booleano
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -140,7 +142,7 @@ const CrearPublicacion = () => {
     data.append('modelo', formData.modelo);
     data.append('precio', formData.precio);
     data.append('ubicacion', formData.ubicacion);
-    data.append('envio', formData.envio);
+    data.append('envio', formData.envio); // booleano
     data.append('tipo_envio', formData.tipo_envio);
     data.append('categoria', formData.categoria);
     data.append('estado', formData.estado);
@@ -260,7 +262,7 @@ const CrearPublicacion = () => {
             <div>
               <strong>Comisión total: {(comision * 100).toFixed(1)}%</strong>
             </div>
-            <div>Comisión en $: ${(parseFloat(formData.precio) * comision).toFixed(2)}</div>
+            <div>Comisión en $: {(parseFloat(formData.precio) * comision).toFixed(2)}</div>
             <div>
               <strong>Ganancia neta: ${ganancia.toFixed(2)}</strong>
             </div>
@@ -284,14 +286,15 @@ const CrearPublicacion = () => {
           <select
             name="envio"
             onChange={handleChange}
+            value={formData.envio ? 'true' : 'false'}
             className="mt-1 w-full px-5 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 transition duration-300"
           >
-            <option value="no">No</option>
-            <option value="si">Sí</option>
+            <option value="false">No</option>
+            <option value="true">Si</option>
           </select>
         </label>
 
-        {formData.envio === 'si' && (
+        {formData.envio && (
           <select
             name="tipo_envio"
             onChange={handleChange}

@@ -55,9 +55,9 @@ const EditarPerfil = () => {
     formData.append('email', email);
     formData.append('contrasena', contrasena);
     formData.append('telefono', telefono);
-    if (usuario.tipo_cuenta === 'vendedor') {
-      formData.append('nombre_local', nombreLocal);
-    }
+    // SIEMPRE enviar nombre_local, aunque esté vacío (para evitar problemas de null)
+    formData.append('nombre_local', usuario.tipo_cuenta === 'vendedor' ? nombreLocal : '');
+
     if (afipFile) formData.append('constanciaAfip', afipFile);
     if (certificadoEstudio && usuario.tipo_cuenta !== 'vendedor') {
       formData.append('certificadoEstudio', certificadoEstudio);
