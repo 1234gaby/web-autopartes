@@ -17,7 +17,7 @@ const AdminVentas = () => {
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
 
-  // Traer todas las ventas con detalles de publicación y usuarios
+  // Traer todas las ventas con detalles completos de publicación y usuarios
   useEffect(() => {
     setLoading(true);
     axios.get(`${API_URL}/ventas-detalle`)
@@ -75,7 +75,20 @@ const AdminVentas = () => {
 
   // Filtrado por búsqueda
   const ventasFiltradas = ventas.filter(v => {
-    const texto = `${v.nombre_producto || ''} ${v.comprador_email || ''} ${v.vendedor_email || ''} ${v.id} ${v.comprador_nombre || ''} ${v.comprador_apellido || ''} ${v.vendedor_nombre || ''} ${v.vendedor_apellido || ''}`.toLowerCase();
+    const texto = `
+      ${v.nombre_producto || ''} 
+      ${v.comprador_email || ''} 
+      ${v.vendedor_email || ''} 
+      ${v.id} 
+      ${v.comprador_nombre || ''} 
+      ${v.comprador_apellido || ''} 
+      ${v.vendedor_nombre || ''} 
+      ${v.vendedor_apellido || ''} 
+      ${v.comprador_telefono || ''} 
+      ${v.vendedor_telefono || ''} 
+      ${v.comprador_nombre_local || ''} 
+      ${v.vendedor_nombre_local || ''}
+    `.toLowerCase();
     return texto.includes(search.toLowerCase());
   });
 
@@ -84,10 +97,10 @@ const AdminVentas = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
-      className="relative flex flex-col items-center min-h-screen bg-gray-100 dark:bg-gray-900 px-4 py-10"
+      className="relative flex flex-col items-center min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-4 py-10"
     >
       {/* Botón Volver y Buscador */}
-      <div className="w-full max-w-5xl flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
+      <div className="w-full max-w-6xl flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
         <Button
           onClick={() => navigate(-1)}
           className="bg-gray-300 hover:bg-gray-400 text-gray-900 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600"
@@ -96,10 +109,10 @@ const AdminVentas = () => {
         </Button>
         <Input
           type="text"
-          placeholder="Buscar por producto, comprador, vendedor, nombre, apellido o ID..."
+          placeholder="Buscar por producto, comprador, vendedor, nombre, apellido, teléfono, local o ID..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full md:w-80 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+          className="w-full md:w-96 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
         />
       </div>
 
@@ -107,7 +120,7 @@ const AdminVentas = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="text-3xl font-extrabold mb-8 text-blue-900 dark:text-blue-200 drop-shadow"
+        className="text-4xl font-extrabold mb-10 text-blue-900 dark:text-blue-200 drop-shadow"
       >
         Administración de Ventas
       </motion.h1>
@@ -119,7 +132,7 @@ const AdminVentas = () => {
       ) : ventasFiltradas.length === 0 ? (
         <div className="text-gray-700 dark:text-gray-200">No hay ventas registradas.</div>
       ) : (
-        <div className="w-full max-w-5xl flex flex-col gap-8">
+        <div className="w-full max-w-6xl flex flex-col gap-10">
           {ventasFiltradas.map((venta) => (
             <motion.div
               key={venta.id}
@@ -127,9 +140,9 @@ const AdminVentas = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="bg-white dark:bg-gray-800 shadow-lg rounded-xl p-4">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
-                  <div className="text-xl text-blue-900 dark:text-blue-100 font-bold flex items-center gap-2">
+              <div className="bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-6 border border-blue-100 dark:border-gray-700">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-2">
+                  <div className="text-2xl text-blue-900 dark:text-blue-100 font-bold flex items-center gap-2">
                     Venta #{venta.id}
                     <span className="text-xs text-gray-500 ml-2">Fecha: {new Date(venta.fecha).toLocaleString()}</span>
                   </div>
@@ -233,34 +246,17 @@ const AdminVentas = () => {
                     </div>
                   </form>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="text-gray-900 dark:text-gray-100"><b>Producto:</b> {venta.nombre_producto}</div>
-                    <div className="text-gray-900 dark:text-gray-100"><b>Cantidad:</b> {venta.cantidad}</div>
-                    <div className="text-gray-900 dark:text-gray-100"><b>Monto:</b> ${Number(venta.monto).toFixed(2)}</div>
-                    <div className="text-gray-900 dark:text-gray-100"><b>Vendedor:</b> {venta.vendedor_nombre} {venta.vendedor_apellido} ({venta.vendedor_email})</div>
-                    <div className="text-gray-900 dark:text-gray-100"><b>Teléfono vendedor:</b> {venta.vendedor_telefono || '-'}</div>
-                    <div className="text-gray-900 dark:text-gray-100"><b>Nombre local vendedor:</b> {venta.vendedor_nombre_local || '-'}</div>
-                    <div className="text-gray-900 dark:text-gray-100"><b>Comprador:</b> {venta.comprador_nombre} {venta.comprador_apellido} ({venta.comprador_email})</div>
-                    <div className="text-gray-900 dark:text-gray-100"><b>Teléfono comprador:</b> {venta.comprador_telefono || '-'}</div>
-                    <div className="text-gray-900 dark:text-gray-100"><b>Localidad envío:</b> {venta.localidad_envio || '-'}</div>
-                    <div className="text-gray-900 dark:text-gray-100"><b>Dirección envío:</b> {venta.direccion_envio || '-'}</div>
-                    <div className="text-gray-900 dark:text-gray-100"><b>Altura envío:</b> {venta.altura_envio || '-'}</div>
-                    <div className="text-gray-900 dark:text-gray-100"><b>Entre calles envío:</b> {venta.entrecalles_envio || '-'}</div>
-                    <div className="text-gray-900 dark:text-gray-100 col-span-2">
-                      <b>Pago recibido:</b>{' '}
-                      <span className={venta.pago_recibido ? "text-green-700 dark:text-green-400 font-bold" : "text-red-700 dark:text-red-400 font-bold"}>
-                        {venta.pago_recibido ? 'Sí' : 'No'}
-                      </span>
-                      <Button
-                        size="sm"
-                        className={`ml-3 ${venta.pago_recibido ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'} text-white`}
-                        onClick={() => handleAprobarPago(venta.id, !venta.pago_recibido)}
-                      >
-                        {venta.pago_recibido ? 'Desaprobar' : 'Aprobar'}
-                      </Button>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Producto y monto */}
+                    <div>
+                      <div className="text-lg font-bold text-blue-800 dark:text-blue-200 mb-2">Producto</div>
+                      <div className="text-gray-900 dark:text-gray-100 mb-1"><b>Nombre:</b> {venta.nombre_producto}</div>
+                      <div className="text-gray-900 dark:text-gray-100 mb-1"><b>Cantidad:</b> {venta.cantidad}</div>
+                      <div className="text-gray-900 dark:text-gray-100 mb-1"><b>Monto:</b> ${Number(venta.monto).toFixed(2)}</div>
                     </div>
-                    <div className="text-gray-900 dark:text-gray-100 col-span-2">
-                      <b>Comprobante de pago:</b>{' '}
+                    {/* Comprobante */}
+                    <div>
+                      <div className="text-lg font-bold text-blue-800 dark:text-blue-200 mb-2">Comprobante de pago</div>
                       {venta.comprobante_pago_url ? (
                         <a
                           href={venta.comprobante_pago_url}
@@ -273,6 +269,48 @@ const AdminVentas = () => {
                       ) : (
                         <span className="text-gray-500">No cargado</span>
                       )}
+                    </div>
+                    {/* Vendedor */}
+                    <div>
+                      <div className="text-lg font-bold text-blue-800 dark:text-blue-200 mb-2">Vendedor</div>
+                      <div className="text-gray-900 dark:text-gray-100 mb-1"><b>Nombre:</b> {venta.vendedor_nombre} {venta.vendedor_apellido}</div>
+                      <div className="text-gray-900 dark:text-gray-100 mb-1"><b>Email:</b> {venta.vendedor_email}</div>
+                      <div className="text-gray-900 dark:text-gray-100 mb-1"><b>Teléfono:</b> {venta.vendedor_telefono || '-'}</div>
+                      <div className="text-gray-900 dark:text-gray-100 mb-1"><b>Nombre del local:</b> {venta.vendedor_nombre_local || '-'}</div>
+                      <div className="text-gray-900 dark:text-gray-100 mb-1"><b>Localidad:</b> {venta.vendedor_localidad || '-'}</div>
+                      <div className="text-gray-900 dark:text-gray-100 mb-1"><b>DNI:</b> {venta.vendedor_dni || '-'}</div>
+                    </div>
+                    {/* Comprador */}
+                    <div>
+                      <div className="text-lg font-bold text-blue-800 dark:text-blue-200 mb-2">Comprador</div>
+                      <div className="text-gray-900 dark:text-gray-100 mb-1"><b>Nombre:</b> {venta.comprador_nombre} {venta.comprador_apellido}</div>
+                      <div className="text-gray-900 dark:text-gray-100 mb-1"><b>Email:</b> {venta.comprador_email}</div>
+                      <div className="text-gray-900 dark:text-gray-100 mb-1"><b>Teléfono:</b> {venta.comprador_telefono || '-'}</div>
+                      <div className="text-gray-900 dark:text-gray-100 mb-1"><b>Nombre del local:</b> {venta.comprador_nombre_local || '-'}</div>
+                      <div className="text-gray-900 dark:text-gray-100 mb-1"><b>Localidad:</b> {venta.comprador_localidad || '-'}</div>
+                      <div className="text-gray-900 dark:text-gray-100 mb-1"><b>DNI:</b> {venta.comprador_dni || '-'}</div>
+                    </div>
+                    {/* Envío */}
+                    <div>
+                      <div className="text-lg font-bold text-blue-800 dark:text-blue-200 mb-2">Datos de envío</div>
+                      <div className="text-gray-900 dark:text-gray-100 mb-1"><b>Localidad:</b> {venta.localidad_envio || '-'}</div>
+                      <div className="text-gray-900 dark:text-gray-100 mb-1"><b>Dirección:</b> {venta.direccion_envio || '-'}</div>
+                      <div className="text-gray-900 dark:text-gray-100 mb-1"><b>Altura:</b> {venta.altura_envio || '-'}</div>
+                      <div className="text-gray-900 dark:text-gray-100 mb-1"><b>Entre calles:</b> {venta.entrecalles_envio || '-'}</div>
+                    </div>
+                    {/* Pago recibido */}
+                    <div className="flex flex-col justify-center">
+                      <div className="text-lg font-bold text-blue-800 dark:text-blue-200 mb-2">Pago recibido</div>
+                      <span className={venta.pago_recibido ? "text-green-700 dark:text-green-400 font-bold" : "text-red-700 dark:text-red-400 font-bold"}>
+                        {venta.pago_recibido ? 'Sí' : 'No'}
+                      </span>
+                      <Button
+                        size="sm"
+                        className={`mt-3 ${venta.pago_recibido ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'} text-white`}
+                        onClick={() => handleAprobarPago(venta.id, !venta.pago_recibido)}
+                      >
+                        {venta.pago_recibido ? 'Desaprobar' : 'Aprobar'}
+                      </Button>
                     </div>
                   </div>
                 )}
