@@ -13,8 +13,13 @@ import EditarPublicacion from './pages/editarpublicacion';
 import VerPublicacion from './pages/verpublicacion';
 import Compra from './pages/compra';
 import MisCompras from './pages/miscompras';
+import MisVentas from './pages/misventas';
+import Admin from './pages/admin';
+import AdminCuentas from './pages/admincuentas';
+import AdminVentas from './pages/adminventas';
 import { DarkModeProvider } from './context/DarkModeContext';
 import { DarkModeToggle } from './components/DarkModeToggle';
+
 
 function App() {
   return (
@@ -39,6 +44,10 @@ function App() {
           <Route path="/editar-publicacion/:id" element={<EditarPublicacion />} />
           <Route path="/publicacion/:id" element={<VerPublicacion />} />
           <Route path="/compra/:id" element={<Compra />} />
+          <Route path="/mis-ventas" element={<MisVentas />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/admincuentas" element={<AdminCuentas />} />
+          <Route path="/adminventas" element={<AdminVentas />} />
         </Routes>
       </BrowserRouter>
     </DarkModeProvider>

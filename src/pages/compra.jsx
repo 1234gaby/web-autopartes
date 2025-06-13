@@ -80,8 +80,13 @@ const Compra = () => {
     <div className="text-center py-10 text-gray-800 dark:text-gray-100">Cargando...</div>
   );
 
-  // Detectar si requiere envío
-  const requiereEnvio = publicacion.envio === 'si' || publicacion.envio === 'Sí' || publicacion.envio === 'SI';
+  // Detectar si requiere envío (soporta true/false, 'si', 'sí', 'SI', 'true')
+  const requiereEnvio = publicacion.envio === true ||
+    publicacion.envio === 'true' ||
+    publicacion.envio === 'si' ||
+    publicacion.envio === 'sí' ||
+    publicacion.envio === 'SI' ||
+    publicacion.envio === 'Sí';
 
   // Validar campos de envío
   const validarCamposEnvio = () => {

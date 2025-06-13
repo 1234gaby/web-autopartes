@@ -17,7 +17,6 @@ const MiCuenta = () => {
     if (!userId) return;
 
     setLoading(true);
-    // Traer datos del usuario
     axios.get(`https://web-autopartes-backend.onrender.com/usuarios/${userId}`)
       .then(res => setUsuario(res.data))
       .catch(err => console.error('Error al cargar usuario', err))
@@ -89,7 +88,6 @@ const MiCuenta = () => {
             {esVendedor && (
               <p><strong>Nombre del local:</strong> {usuario.nombre_local || '-'}</p>
             )}
-            {/* Mostrar cashback */}
             <p>
               <strong>Cashback acumulado:</strong> ${cashbackMostrado}
             </p>
@@ -157,16 +155,28 @@ const MiCuenta = () => {
                 Mis compras
               </MotionButton>
             )}
+            {/* Mostrar "Mis ventas" solo si es vendedor */}
             {esVendedor && (
-              <MotionButton
-                onClick={() => navigate('/mis-publicaciones')}
-                className="px-5 py-2 rounded bg-purple-600 text-white hover:bg-purple-700 transition"
-                type="button"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Mis publicaciones
-              </MotionButton>
+              <>
+                <MotionButton
+                  onClick={() => navigate('/mis-ventas')}
+                  className="px-5 py-2 rounded bg-orange-600 text-white hover:bg-orange-700 transition"
+                  type="button"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Mis ventas
+                </MotionButton>
+                <MotionButton
+                  onClick={() => navigate('/mis-publicaciones')}
+                  className="px-5 py-2 rounded bg-purple-600 text-white hover:bg-purple-700 transition"
+                  type="button"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Mis publicaciones
+                </MotionButton>
+              </>
             )}
           </div>
         </div>

@@ -38,6 +38,15 @@ function Login() {
     e.preventDefault();
     setLoading(true);
 
+    // Acceso directo para admin
+    if (email === 'admin@admin.com' && password === 'admin') {
+      localStorage.setItem('email', email);
+      localStorage.setItem('password', password);
+      setLoading(false);
+      navigate('/admin');
+      return;
+    }
+
     try {
       const response = await fetch('https://web-autopartes-backend.onrender.com/login', {
         method: 'POST',
