@@ -4,11 +4,12 @@ import { motion } from 'framer-motion';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardContent } from '../components/ui/card';
 import { Loader2 } from 'lucide-react';
 import { LoadingOverlay } from '../components/ui/LoadingOverlay';
+import DeLoreanImg from './DELOREAN.png';
 
-const MotionButton = motion.create(Button);
+const MotionButton = motion(Button);
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -97,17 +98,37 @@ function Login() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <Card className="p-6 bg-white dark:bg-gray-800">
-          <CardHeader>
-            <CardTitle className="text-3xl text-center text-gray-900 dark:text-gray-100">
-              Iniciar sesión
-            </CardTitle>
-          </CardHeader>
-
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+        <Card className="p-0 bg-white/95 dark:bg-gray-800/95 shadow-2xl rounded-3xl overflow-hidden border-0">
+          {/* Header moderno con imagen DeLorean */}
+          <div className="bg-white dark:bg-gray-800 py-8 px-6 flex flex-col items-center border-b border-gray-200 dark:border-gray-700">
+            <img
+              src={DeLoreanImg}
+              alt="DeLorean"
+              className="mb-2"
+              style={{
+                width: 360,
+                height: 180,
+                objectFit: 'contain',
+                background: 'transparent',
+                boxShadow: '0 4px 24px 0 rgba(37,99,235,0.10)',
+                borderRadius: '0.75rem',
+                border: 'none',
+                display: 'block',
+                mixBlendMode: 'multiply'
+              }}
+              loading="lazy"
+            />
+            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-1 tracking-tight drop-shadow flex items-center gap-2">
+              DeLorean Parts
+            </h1>
+            <p className="text-gray-500 dark:text-gray-300 text-center text-base">
+              Iniciá sesión para viajar al futuro de los repuestos.
+            </p>
+          </div>
+          <CardContent className="py-8 px-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <Label htmlFor="email" className="text-gray-900 dark:text-gray-100">Email</Label>
+                <Label htmlFor="email" className="text-gray-900 dark:text-gray-100 font-semibold">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -115,11 +136,12 @@ function Login() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   autoComplete="username"
-                  className="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  className="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 mt-1"
+                  placeholder="tu@email.com"
                 />
               </div>
               <div>
-                <Label htmlFor="password" className="text-gray-900 dark:text-gray-100">Contraseña</Label>
+                <Label htmlFor="password" className="text-gray-900 dark:text-gray-100 font-semibold">Contraseña</Label>
                 <Input
                   id="password"
                   type="password"
@@ -127,7 +149,8 @@ function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
-                  className="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  className="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 mt-1"
+                  placeholder="Contraseña"
                 />
               </div>
 
@@ -144,7 +167,7 @@ function Login() {
               <MotionButton
                 type="submit"
                 disabled={loading}
-                className="flex items-center justify-center w-full transition-transform duration-150"
+                className="flex items-center justify-center w-full bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500 text-white font-bold py-2 rounded-full shadow-lg transition-transform duration-150"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -153,10 +176,10 @@ function Login() {
               </MotionButton>
             </form>
 
-            <div className="mt-6 space-y-3">
+            <div className="mt-8 space-y-3">
               <MotionButton
                 onClick={irARegistro}
-                className="w-full bg-gray-300 text-gray-800 hover:bg-gray-400 transition-transform duration-150"
+                className="w-full bg-white dark:bg-gray-700 border border-blue-400 text-blue-700 dark:text-blue-200 font-semibold rounded-full shadow hover:bg-blue-50 dark:hover:bg-gray-600 transition-transform duration-150"
                 type="button"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -166,7 +189,7 @@ function Login() {
 
               <MotionButton
                 onClick={continuarComoInvitado}
-                className="w-full bg-green-600 hover:bg-green-700 text-white transition-transform duration-150"
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold rounded-full shadow transition-transform duration-150"
                 type="button"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
