@@ -8,6 +8,7 @@ const Compra = () => {
   const userId = localStorage.getItem('user_id');
   const [publicacion, setPublicacion] = useState(null);
   const [comprador, setComprador] = useState(null);
+  const [vendedor, setVendedor] = useState(null);
   const [comprasUltimos30, setComprasUltimos30] = useState(0);
   const [desglose, setDesglose] = useState(null);
   const [cantidad, setCantidad] = useState(1);
@@ -24,7 +25,14 @@ const Compra = () => {
 
   useEffect(() => {
     axios.get(`https://web-autopartes-backend.onrender.com/publicaciones/${id}`)
-      .then(res => setPublicacion(res.data));
+      .then(res => {
+        setPublicacion(res.data);
+        // Traer datos del vendedor
+        if (res.data.user_id) {
+          axios.get(`https://web-autopartes-backend.onrender.com/usuarios/${res.data.user_id}`)
+            .then(resVendedor => setVendedor(resVendedor.data));
+        }
+      });
     axios.get(`https://web-autopartes-backend.onrender.com/usuarios/${userId}`)
       .then(res => setComprador(res.data));
     axios.get(`https://web-autopartes-backend.onrender.com/usuarios/${userId}/compras-ultimos-30`)
@@ -35,37 +43,48 @@ const Compra = () => {
     if (!publicacion || !comprador) return;
     const precioUnitario = parseFloat(publicacion.precio) || 0;
     const subtotal = precioUnitario * cantidad;
-    const totalSinCashback = subtotal;
 
-    let porcentajeCupon = comprasUltimos30 > 10 ? 0.05 : 0.03;
-    const cupon = totalSinCashback * porcentajeCupon;
-
+    // Descuentos por constancia AFIP y certificado de estudio (sobre el comprador)
+    let descuentoPorcentaje = 0;
     let descuentosAplicados = [];
     let descuentosNoAplicados = [];
-    if (comprador.constancia_afip_aprobada) {
-      descuentosAplicados.push('Constancia AFIP/ARCA aprobada: -5% comisión');
+
+    if (comprador.aprobado_constancia_afip) {
+      descuentoPorcentaje += 0.05;
+      descuentosAplicados.push('Constancia AFIP/ARCA aprobada: -5%');
     } else {
-      descuentosNoAplicados.push('Constancia AFIP/ARCA aprobada: -5% comisión');
+      descuentosNoAplicados.push('Constancia AFIP/ARCA aprobada: -5%');
     }
-    if (comprador.certificado_estudio_aprobado) {
-      descuentosAplicados.push('Certificado de estudio aprobado: -5% comisión');
+    if (comprador.aprobado_certificado_estudio) {
+      descuentoPorcentaje += 0.05;
+      descuentosAplicados.push('Certificado de estudio aprobado: -5%');
     } else {
-      descuentosNoAplicados.push('Certificado de estudio aprobado: -5% comisión');
+      descuentosNoAplicados.push('Certificado de estudio aprobado: -5%');
     }
 
+    // Total con descuentos
+    const totalConDescuentos = subtotal * (1 - descuentoPorcentaje);
+
+    // Cupón para próxima compra
+    let porcentajeCupon = comprasUltimos30 > 10 ? 0.05 : 0.03;
+    const cupon = totalConDescuentos * porcentajeCupon;
+
+    // Cashback
     const cashbackDisponible = Number(comprador.cashback) || 0;
     let cashbackAplicado = 0;
-    let total = totalSinCashback;
+    let total = totalConDescuentos;
     if (usarCashback && cashbackDisponible > 0) {
-      cashbackAplicado = Math.min(cashbackDisponible, totalSinCashback);
-      total = totalSinCashback - cashbackAplicado;
+      cashbackAplicado = Math.min(cashbackDisponible, totalConDescuentos);
+      total = totalConDescuentos - cashbackAplicado;
     }
 
     setDesglose({
       precioUnitario,
       cantidad,
       subtotal,
-      totalSinCashback,
+      descuentoPorcentaje,
+      totalConDescuentos,
+      totalSinCashback: totalConDescuentos,
       total,
       descuentosAplicados,
       descuentosNoAplicados,
@@ -154,8 +173,13 @@ const Compra = () => {
         <div className="mb-2 text-gray-800 dark:text-gray-100 text-lg text-center">
           <strong>Subtotal:</strong> ${desglose.subtotal.toFixed(2)}
         </div>
+        {desglose.descuentoPorcentaje > 0 && (
+          <div className="mb-2 text-green-700 dark:text-green-400 text-center">
+            <strong>Descuento aplicado:</strong> -{(desglose.descuentoPorcentaje * 100).toFixed(0)}% (${(desglose.subtotal * desglose.descuentoPorcentaje).toFixed(2)})
+          </div>
+        )}
         <div className="mb-2 text-gray-800 dark:text-gray-100 text-lg text-center">
-          <strong>Total a pagar:</strong> ${desglose.totalSinCashback.toFixed(2)}
+          <strong>Total a pagar:</strong> ${desglose.totalConDescuentos.toFixed(2)}
         </div>
         <div className="mb-2 text-gray-800 dark:text-gray-100 text-center">
           <strong>Cashback disponible:</strong> ${Number(desglose.cashbackDisponible).toFixed(2)}

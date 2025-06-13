@@ -3,6 +3,12 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
+const DATOS_TRANSFERENCIA = {
+  alias: 'autopartes.delorean',
+  cbu: '11223344556677889900',
+  nombre: 'DeLorean Autopartes SRL'
+};
+
 const MisCompras = () => {
   const [compras, setCompras] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,6 +16,8 @@ const MisCompras = () => {
   const [subiendo, setSubiendo] = useState({});
   const [vendedores, setVendedores] = useState({});
   const [aviso, setAviso] = useState('');
+  const [popupPago, setPopupPago] = useState(null); // id de la compra para mostrar popup
+  const [confirmando, setConfirmando] = useState({});
   const navigate = useNavigate();
   const userId = localStorage.getItem('user_id');
 
@@ -89,6 +97,23 @@ const MisCompras = () => {
     return '-';
   };
 
+  // Confirmar recepción (requiere backend y campo en la tabla ventas)
+  const handleConfirmarRecepcion = async (ventaId) => {
+    setConfirmando(prev => ({ ...prev, [ventaId]: true }));
+    try {
+      await axios.put(
+        `https://web-autopartes-backend.onrender.com/ventas/${ventaId}`,
+        { confirmacioncomprador: true }
+      );
+      // Refrescar compras
+      const res = await axios.get(`https://web-autopartes-backend.onrender.com/usuarios/${userId}/compras`);
+      setCompras(res.data || []);
+    } catch {
+      alert('Error al confirmar recepción');
+    }
+    setConfirmando(prev => ({ ...prev, [ventaId]: false }));
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -149,7 +174,7 @@ const MisCompras = () => {
           className="w-full max-w-[98vw]"
         >
           <div className="rounded-lg shadow-xl overflow-x-auto bg-white dark:bg-gray-800">
-            <table className="w-full min-w-[1200px]">
+            <table className="w-full min-w-[1300px]">
               <thead>
                 <tr className="bg-blue-100 dark:bg-blue-900">
                   <th className="px-4 py-2 text-left font-semibold text-blue-900 dark:text-blue-100">Producto</th>
@@ -160,7 +185,9 @@ const MisCompras = () => {
                   <th className="px-4 py-2 text-left font-semibold text-blue-900 dark:text-blue-100">Local</th>
                   <th className="px-4 py-2 text-left font-semibold text-blue-900 dark:text-blue-100">Envío</th>
                   <th className="px-4 py-2 text-left font-semibold text-blue-900 dark:text-blue-100">Ver publicación</th>
+                  <th className="px-4 py-2 text-left font-semibold text-blue-900 dark:text-blue-100">Pago</th>
                   <th className="px-4 py-2 text-left font-semibold text-blue-900 dark:text-blue-100">Comprobante</th>
+                  <th className="px-4 py-2 text-left font-semibold text-blue-900 dark:text-blue-100">Recepción</th>
                 </tr>
               </thead>
               <tbody>
@@ -196,6 +223,47 @@ const MisCompras = () => {
                         </motion.button>
                       </td>
                       <td className="px-4 py-2">
+                        <motion.button
+                          whileHover={{ scale: 1.07 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="px-2 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 transition"
+                          onClick={() => setPopupPago(compra.id)}
+                        >
+                          Ver datos
+                        </motion.button>
+                        {/* Popup de datos de pago */}
+                        {popupPago === compra.id && (
+                          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8 max-w-xs w-full relative">
+                              <button
+                                className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 text-xl"
+                                onClick={() => setPopupPago(null)}
+                              >
+                                ×
+                              </button>
+                              <h3 className="text-xl font-bold mb-4 text-blue-800 dark:text-blue-200 text-center">Datos para transferencia</h3>
+                              <div className="mb-2">
+                                <span className="font-semibold">Alias:</span> <span className="font-mono">{DATOS_TRANSFERENCIA.alias}</span>
+                              </div>
+                              <div className="mb-2">
+                                <span className="font-semibold">CBU:</span> <span className="font-mono">{DATOS_TRANSFERENCIA.cbu}</span>
+                              </div>
+                              <div className="mb-2">
+                                <span className="font-semibold">Nombre de la cuenta:</span> <span>{DATOS_TRANSFERENCIA.nombre}</span>
+                              </div>
+                              <div className="mt-4 flex justify-center">
+                                <button
+                                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                                  onClick={() => setPopupPago(null)}
+                                >
+                                  Cerrar
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-4 py-2">
                         {compra.comprobante_pago_url ? (
                           <a
                             href={compra.comprobante_pago_url}
@@ -222,6 +290,21 @@ const MisCompras = () => {
                               {subiendo[compra.id] ? 'Subiendo...' : 'Subir'}
                             </motion.button>
                           </div>
+                        )}
+                      </td>
+                      <td className="px-4 py-2">
+                        {compra.confirmacioncomprador ? (
+                          <span className="text-green-700 dark:text-green-400 font-semibold">Confirmado</span>
+                        ) : (
+                          <motion.button
+                            whileHover={{ scale: 1.07 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="px-2 py-1 bg-green-700 text-white rounded hover:bg-green-800 transition"
+                            onClick={() => handleConfirmarRecepcion(compra.id)}
+                            disabled={confirmando[compra.id]}
+                          >
+                            {confirmando[compra.id] ? 'Confirmando...' : 'Confirmar recepción'}
+                          </motion.button>
                         )}
                       </td>
                     </motion.tr>

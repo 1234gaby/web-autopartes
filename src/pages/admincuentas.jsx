@@ -40,13 +40,17 @@ function AdminCuentas() {
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
   // Traer todos los usuarios
-  useEffect(() => {
+  const fetchUsuarios = () => {
     setLoading(true);
     fetch(`${API_URL}/usuarios`)
       .then(res => res.json())
       .then(data => setUsuarios(data))
       .catch(() => setUsuarios([]))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchUsuarios();
   }, []);
 
   // Editar usuario
@@ -92,8 +96,18 @@ function AdminCuentas() {
 
   // Aprobar/rechazar constancias
   const handleAprobar = async (userId, campo, valor) => {
-    const body = {};
-    body[campo] = valor;
+    // Enviar ambos campos de aprobación para evitar que se pisen entre sí
+    const user = usuarios.find(u => u.id === userId);
+    const body = {
+      aprobado_constancia_afip:
+        campo === 'aprobado_constancia_afip'
+          ? valor
+          : user.aprobado_constancia_afip === true || user.aprobado_constancia_afip === 'true',
+      aprobado_certificado_estudio:
+        campo === 'aprobado_certificado_estudio'
+          ? valor
+          : user.aprobado_certificado_estudio === true || user.aprobado_certificado_estudio === 'true',
+    };
     try {
       const res = await fetch(`${API_URL}/usuarios/${userId}`, {
         method: 'PUT',

@@ -171,9 +171,8 @@ function Home() {
               border: 'none',
               boxShadow: 'none',
               display: 'block',
-              mixBlendMode: 'multiply',
-              width: '400px',
-              height: '188px',
+              width: '240px',
+              height: '80px',
               maxWidth: '90vw'
             }}
             loading="lazy"

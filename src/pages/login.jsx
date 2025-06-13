@@ -106,15 +106,14 @@ function Login() {
               alt="DeLorean"
               className="mb-2"
               style={{
-                width: 360,
-                height: 180,
+                width: 240,
+                height: 120,
                 objectFit: 'contain',
                 background: 'transparent',
                 boxShadow: '0 4px 24px 0 rgba(37,99,235,0.10)',
                 borderRadius: '0.75rem',
                 border: 'none',
                 display: 'block',
-                mixBlendMode: 'multiply'
               }}
               loading="lazy"
             />

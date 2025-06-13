@@ -48,7 +48,7 @@ const CrearPublicacion = () => {
     // Traer usuario
     axios.get(`https://web-autopartes-backend.onrender.com/usuarios/${userId}`)
       .then(res => {
-        setAfipAprobada(res.data.constancia_afip_aprobada === true);
+        setAfipAprobada(res.data.aprobado_constancia_afip === true);
       })
       .catch(() => setAfipAprobada(false));
     // Traer ventas últimos 30 días
