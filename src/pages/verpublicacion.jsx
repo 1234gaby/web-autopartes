@@ -15,8 +15,11 @@ const VerPublicacion = () => {
   const [imgSeleccionada, setImgSeleccionada] = useState(0);
   const [modalAbierto, setModalAbierto] = useState(false);
 
-  // Detectar si el usuario está logueado
+  // Detectar si el usuario está logueado y su perfil
   const userId = localStorage.getItem('user_id');
+  let perfil = localStorage.getItem('perfil');
+  if (perfil === null || perfil === undefined) perfil = '';
+  const esVendedor = perfil && perfil.toString().toLowerCase().trim() === 'vendedor';
 
   useEffect(() => {
     setLoading(true);
@@ -204,7 +207,7 @@ const VerPublicacion = () => {
               </div>
             )}
           </div>
-          {/* Mostrar vendedor y botón solo si está logueado */}
+          {/* Mostrar vendedor y botón solo si está logueado y NO es vendedor */}
           {userId ? (
             <div className="md:w-1/2 flex flex-col gap-4">
               <div className="bg-blue-50 dark:bg-blue-900/40 rounded-lg p-4 shadow">
@@ -218,15 +221,17 @@ const VerPublicacion = () => {
                   {/* No mostrar nombre, apellido ni email */}
                 </div>
               </div>
-              <MotionButton
-                type="button"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg text-lg shadow-lg"
-                onClick={() => navigate(`/compra/${publicacion.id}`)}
-              >
-                Comprar
-              </MotionButton>
+              {!esVendedor && (
+                <MotionButton
+                  type="button"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg text-lg shadow-lg"
+                  onClick={() => navigate(`/compra/${publicacion.id}`)}
+                >
+                  Comprar
+                </MotionButton>
+              )}
             </div>
           ) : (
             <div className="md:w-1/2 flex flex-col gap-4 items-center justify-center">
