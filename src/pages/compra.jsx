@@ -23,6 +23,11 @@ const Compra = () => {
   const [entrecallesEnvio, setEntrecallesEnvio] = useState('');
   const [erroresEnvio, setErroresEnvio] = useState('');
 
+  // Detectar si el usuario es mecánico
+  let perfil = localStorage.getItem('perfil');
+  if (perfil === null || perfil === undefined) perfil = '';
+  const esMecanico = perfil && perfil.toString().toLowerCase().trim() === 'mecanico';
+
   useEffect(() => {
     axios.get(`https://web-autopartes-backend.onrender.com/publicaciones/${id}`)
       .then(res => {
@@ -281,43 +286,45 @@ const Compra = () => {
         )}
 
         <div className="flex flex-col sm:flex-row justify-center gap-4 mt-6">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.97 }}
-            className="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-800 dark:to-blue-600 text-white rounded font-bold shadow-lg transition-all duration-200"
-            disabled={loading}
-            onClick={async () => {
-              // Validar campos de envío si corresponde
-              if (requiereEnvio && !validarCamposEnvio()) return;
+          {esMecanico && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.97 }}
+              className="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-800 dark:to-blue-600 text-white rounded font-bold shadow-lg transition-all duration-200"
+              disabled={loading}
+              onClick={async () => {
+                // Validar campos de envío si corresponde
+                if (requiereEnvio && !validarCamposEnvio()) return;
 
-              setLoading(true);
-              try {
-                await axios.post('https://web-autopartes-backend.onrender.com/ventas', {
-                  vendedor_id: publicacion.user_id,
-                  comprador_id: comprador.id,
-                  publicacion_id: publicacion.id,
-                  cantidad,
-                  monto: desglose.total,
-                  localidad_envio: requiereEnvio ? localidadEnvio : null,
-                  direccion_envio: requiereEnvio ? direccionEnvio : null,
-                  altura_envio: requiereEnvio ? alturaEnvio : null,
-                  entrecalles_envio: requiereEnvio ? entrecallesEnvio : null
-                });
-                const nuevoCashback = (Number(desglose.cashbackDisponible) - Number(desglose.cashbackAplicado)) + Number(desglose.cupon);
-                await axios.put(`https://web-autopartes-backend.onrender.com/usuarios/${userId}/cashback`, {
-                  cashback: nuevoCashback
-                });
-                alert('¡Compra realizada! Tu cupón se ha actualizado.');
-                navigate('/micuenta');
-              } catch {
-                alert('Error al realizar la compra');
-              } finally {
-                setLoading(false);
-              }
-            }}
-          >
-            {loading ? 'Procesando...' : 'Comprar'}
-          </motion.button>
+                setLoading(true);
+                try {
+                  await axios.post('https://web-autopartes-backend.onrender.com/ventas', {
+                    vendedor_id: publicacion.user_id,
+                    comprador_id: comprador.id,
+                    publicacion_id: publicacion.id,
+                    cantidad,
+                    monto: desglose.total,
+                    localidad_envio: requiereEnvio ? localidadEnvio : null,
+                    direccion_envio: requiereEnvio ? direccionEnvio : null,
+                    altura_envio: requiereEnvio ? alturaEnvio : null,
+                    entrecalles_envio: requiereEnvio ? entrecallesEnvio : null
+                  });
+                  const nuevoCashback = (Number(desglose.cashbackDisponible) - Number(desglose.cashbackAplicado)) + Number(desglose.cupon);
+                  await axios.put(`https://web-autopartes-backend.onrender.com/usuarios/${userId}/cashback`, {
+                    cashback: nuevoCashback
+                  });
+                  alert('¡Compra realizada! Tu cupón se ha actualizado.');
+                  navigate('/micuenta');
+                } catch {
+                  alert('Error al realizar la compra');
+                } finally {
+                  setLoading(false);
+                }
+              }}
+            >
+              {loading ? 'Procesando...' : 'Comprar'}
+            </motion.button>
+          )}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.97 }}

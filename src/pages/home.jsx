@@ -385,23 +385,23 @@ function Home() {
               )}
 
               <div className="p-5 flex flex-col flex-1">
-                <h2 className="text-xl font-bold truncate mb-1">{pub.nombre_producto}</h2>
-                <p className="mb-1"><strong>Marca:</strong> {pub.marca}</p>
-                <p className="mb-1"><strong>Modelo:</strong> {pub.modelo}</p>
-                <p className="mb-1">
+                <h2 className="text-xl font-bold truncate mb-1 text-gray-900 dark:text-white">{pub.nombre_producto}</h2>
+                <p className="mb-1 text-gray-800 dark:text-gray-100"><strong>Marca:</strong> {pub.marca}</p>
+                <p className="mb-1 text-gray-800 dark:text-gray-100"><strong>Modelo:</strong> {pub.modelo}</p>
+                <p className="mb-1 text-gray-800 dark:text-gray-100">
                   <strong>Precio:</strong>{' '}
                   {userId ? `$${pub.precio.toLocaleString('es-AR')}` : 'Iniciar sesión para ver'}
                 </p>
-                <p className="mb-1">
+                <p className="mb-1 text-gray-800 dark:text-gray-100">
                   <strong>Ubicación:</strong>{' '}
                   {userId ? pub.ubicacion : 'Iniciar sesión para ver'}
                 </p>
-                <p className="mb-1"><strong>Estado:</strong> {pub.estado.charAt(0).toUpperCase() + pub.estado.slice(1)}</p>
-                <p className="mb-1"><strong>Envío:</strong> {mostrarEnvio(pub)}</p>
+                <p className="mb-1 text-gray-800 dark:text-gray-100"><strong>Estado:</strong> {pub.estado.charAt(0).toUpperCase() + pub.estado.slice(1)}</p>
+                <p className="mb-1 text-gray-800 dark:text-gray-100"><strong>Envío:</strong> {mostrarEnvio(pub)}</p>
                 {Array.isArray(pub.compatibilidad) && pub.compatibilidad.length > 0 && (
                   <div className="mt-2">
-                    <strong>Compatibilidad:</strong>
-                    <ul className="list-disc list-inside text-sm">
+                    <strong className="text-gray-800 dark:text-gray-100">Compatibilidad:</strong>
+                    <ul className="list-disc list-inside text-sm text-gray-700 dark:text-gray-200">
                       {pub.compatibilidad.slice(0, 2).map((c, i) => (
                         <li key={i}>
                           {c.marca ? c.marca.charAt(0).toUpperCase() + c.marca.slice(1) : ''} {c.modelo}
