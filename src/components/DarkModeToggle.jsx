@@ -1,17 +1,19 @@
 // src/components/DarkModeToggle.jsx
 import React from 'react';
-import { useDarkMode } from '../context/DarkModeContext';
+import { useDarkMode } from './DarkModeProvider';
 
-export function DarkModeToggle() {
-  const { darkMode, setDarkMode } = useDarkMode();
+export default function DarkModeToggle() {
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
 
   return (
-    <button
-      onClick={() => setDarkMode(!darkMode)}
-      className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 transition"
-      aria-label="Toggle Dark Mode"
-    >
-      {darkMode ? '🌙 Modo oscuro' : '☀️ Modo claro'}
-    </button>
+    <div className="fixed bottom-4 right-4 z-50">
+      <button
+        onClick={toggleDarkMode}
+        className="bg-gray-200 dark:bg-gray-700 rounded-full p-3 shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+        aria-label="Cambiar modo oscuro"
+      >
+        {isDarkMode ? '🌙' : '☀️'}
+      </button>
+    </div>
   );
 }
