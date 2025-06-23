@@ -20,15 +20,12 @@ import AdminVentas from './pages/adminventas';
 import { DarkModeProvider } from './context/DarkModeContext';
 import { DarkModeToggle } from './components/DarkModeToggle';
 
-
 function App() {
   return (
     <DarkModeProvider>
       <BrowserRouter>
-        {/* Botón de modo oscuro/claro siempre visible en la esquina superior derecha */}
-        <div className="fixed top-4 right-4 z-50">
-          <DarkModeToggle />
-        </div>
+        {/* Botón de modo oscuro/claro siempre visible en la esquina inferior derecha */}
+        <DarkModeToggle />
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/register" element={<Register />} />
