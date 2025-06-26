@@ -52,14 +52,6 @@ export default function Recuperacion() {
       transition={{ duration: 0.6 }}
       className="relative flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-900 px-4"
     >
-      <button
-        onClick={toggleDarkMode}
-        className="fixed top-4 right-4 p-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 transition"
-        aria-label="Toggle Dark Mode"
-        title={isDarkMode ? 'Modo claro' : 'Modo oscuro'}
-      >
-        {isDarkMode ? '🌙' : '☀️'}
-      </button>
 
       <LoadingOverlay loading={loading} />
 
