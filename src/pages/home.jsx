@@ -198,7 +198,7 @@ function Home() {
                 <Button
                   variant="secondary"
                   onClick={() => navigate('/micuenta')}
-                  className="min-w-[90px] bg-white dark:bg-gray-700 border border-blue-400 text-blue-700 dark:text-blue-200 shadow"
+                  className="min-w-[90px] bg-blue-50 dark:bg-gray-700 border border-blue-400 text-blue-800 dark:text-blue-200 shadow"
                   as={motion.button}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
