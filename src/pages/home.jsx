@@ -223,7 +223,7 @@ function Home() {
             ) : (
               <Button
                 variant="primary"
-                onClick={() => navigate('/login')}
+                onClick={() => navigate('/')}
                 className="min-w-[110px] bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500 text-white shadow"
                 as={motion.button}
                 whileHover={{ scale: 1.05 }}
