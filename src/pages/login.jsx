@@ -169,7 +169,7 @@ function Login() {
             <div className="mt-8 space-y-3">
               <MotionButton
                 onClick={irARegistro}
-                className="w-full bg-white dark:bg-gray-700 border border-blue-400 text-blue-700 dark:text-blue-200 font-semibold rounded-full shadow hover:bg-blue-50 dark:hover:bg-gray-600 transition-transform duration-150"
+                className="w-full bg-blue-50 dark:bg-gray-700 border border-blue-500 text-blue-800 dark:text-blue-200 font-semibold rounded-full shadow hover:bg-blue-100 dark:hover:bg-gray-600 transition-transform duration-150"
                 type="button"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
